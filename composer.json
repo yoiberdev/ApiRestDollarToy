@@ -1,0 +1,17 @@
+{
+    "name": "yoibe/api-rest-dollar-toy",
+    "description": "Apirest de proyecto de ventas",
+    "type": "project",
+    "autoload": {
+        "psr-4": {
+            "Yoibe\\ApiRestDollarToy\\": "src/"
+        }
+    },
+    "authors": [
+        {
+            "name": "yoiber",
+            "email": "yoiber696@gmail.com"
+        }
+    ],
+    "require": {}
+}
