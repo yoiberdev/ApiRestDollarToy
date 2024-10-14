@@ -6,5 +6,6 @@ $vendorDir = dirname(__DIR__);
 $baseDir = dirname($vendorDir);
 
 return array(
+    'app\\' => array($baseDir . '/src'),
     'Yoibe\\ApiRestDollarToy\\' => array($baseDir . '/src'),
 );

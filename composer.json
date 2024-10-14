@@ -4,7 +4,8 @@
     "type": "project",
     "autoload": {
         "psr-4": {
-            "Yoibe\\ApiRestDollarToy\\": "src/"
+            "Yoibe\\ApiRestDollarToy\\": "src/",
+            "app\\": "src/"
         }
     },
     "authors": [
