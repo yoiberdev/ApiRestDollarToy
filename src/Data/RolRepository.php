@@ -8,28 +8,6 @@ use app\Models\Rol;
 
 class RolRepository extends BaseData implements RolInterface
 {
-    public function getAll(): array
-    {
-        $sql = "SELECT * FROM tb_rol";
-        $stmt = $this->pdo->prepare($sql);
-        $stmt->execute();
-        $rols = [];
-        foreach ($stmt->fetchAll(PDO::FETCH_OBJ) as $rol) {
-            $rols[] = new Rol($rol->id_rol, $rol->nombre);
-        }
-        return $rols;
-    }
-
-    public function getById(int $id): ?Rol
-    {
-        $sql = "SELECT * FROM tb_rol WHERE id_rol = :id";   
-        $stmt = $this->pdo->prepare($sql);
-        $stmt->bindParam(':id', $id, PDO::PARAM_INT);
-        $stmt->execute();
-        $row = $stmt->fetch(PDO::FETCH_OBJ);
-        return $row ? new Rol($row->id_rol, $row->nombre) : null;
-    }
-
     public function create(Rol $rol): bool
     {
         $sql = "INSERT INTO tb_rol (nombre) VALUES (:nombre)";
@@ -59,11 +37,46 @@ class RolRepository extends BaseData implements RolInterface
 
     public function exists(int $id): bool
     {
-        $sql = "SELECT COUNT(*) FROM tb_rol WHERE id_rol = :id";
+        $sql = "SELECT COUNT(*) AS count FROM tb_rol WHERE id_rol = :id";
         $stmt = $this->pdo->prepare($sql);
         $stmt->bindParam(':id', $id, PDO::PARAM_INT);
         $stmt->execute();
         $row = $stmt->fetch(PDO::FETCH_OBJ);
         return $row->count > 0;
+    }
+
+    public function find(array $filters): array
+    {
+        $sql = "SELECT * FROM tb_rol";
+        $conditions = [];
+        $params = [];
+
+        if (!empty($filters)) {
+            foreach ($filters as $key => $value) {
+                if (!empty($value)) {
+                    if ($key === 'search') {
+                        $conditions[] = "nombre LIKE :search";
+                        $params[":search"] = '%' . $value . '%';
+                    } else {
+                        $conditions[] = "$key = :$key";
+                        $params[":$key"] = $value;
+                    }
+                }
+            }
+
+            if (!empty($conditions)) {
+                $sql .= " WHERE " . implode(' AND ', $conditions);
+            }
+        }
+
+        $stmt = $this->pdo->prepare($sql);
+        $stmt->execute($params);
+
+        $roles = [];
+        foreach ($stmt->fetchAll(PDO::FETCH_OBJ) as $rol) {
+            $roles[] = new Rol($rol->id_rol, $rol->nombre);
+        }
+
+        return $roles;
     }
 }

@@ -18,8 +18,12 @@ class RolUpdate
         $this->validator = $validator;
     }
 
-    public function updateById(int $id, array $data): string
+    public function updateById(int $id = null, array $data = []): string
     {
+        if (!$this->validator->validateId($id)) {
+            throw new ValidationException($this->validator->getError());
+        }
+
         if (!$this->validator->validateUpdate($data)) {
             throw new ValidationException($this->validator->getError());
         }
@@ -28,8 +32,8 @@ class RolUpdate
             throw new DataException('Rol con id '.$id.' no encontrado');
         }
 
-        $rol = $this->rol->getById($id);
+        $rol = $this->rol->find(['id_rol' => $id]);
 
-        return "Rol con id ".$rol->getId()." actualizado con éxito";
+        return "Rol con id ". $rol[0]->getId() ." actualizado con éxito";
     }
 }

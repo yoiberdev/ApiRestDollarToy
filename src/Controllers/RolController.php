@@ -31,24 +31,17 @@ class RolController
     public function handleRequest(string $method, array $data): string
     {
         switch ($method) {
+            case 'find':
+                $result = $this->get->find($data);
+                return json_encode($result);
+
             case 'create':
                 $result = $this->create->add($data);
                 return json_encode(['message' => 'Rol creado exitosamente', 'data' => $result]);
 
-            case 'get':
-                $result = $this->get->getAll();
-                return json_encode($result);
-
-            case 'getById':
-                $result = $this->get->getById($data['id']);
-                if ($result === null) {
-                    return json_encode(['error' => 'Rol no encontrado']);
-                }
-                return json_encode($result);
-
             case 'update':
-                $this->update->updateById($data['id'], $data);
-                return json_encode(['message' => 'Rol actualizado exitosamente']);
+                $result =$this->update->updateById($data['id'], $data);
+                return json_encode(['message' => $result]);
 
             case 'delete':
                 $this->delete->deleteById($data['id']);
@@ -66,7 +59,7 @@ class RolController
 
         return new self(
             new RolAdd($repository, $validator),
-            new RolGet($repository),
+            new RolGet($repository, $validator),
             new RolUpdate($repository, $validator),
             new RolDelete($repository)
         );

@@ -4,33 +4,38 @@ namespace app\Business\Rol;
 
 use app\exceptions\DataException;
 use app\Interfaces\RolInterface;
+use app\Models\Rol;
+use app\Validators\RolValidator;
 
 class RolGet
 {
     private RolInterface $rol;
+    private RolValidator $validator;
 
-    public function __construct(RolInterface $rol)
+    public function __construct(RolInterface $rol, RolValidator $validator)
     {
         $this->rol = $rol;
+        $this->validator = $validator;
     }
 
-    public function getAll(): array
+    public function find(array $filters): array
     {
-        $roles = $this->rol->getAll();
+        if (!$this->validator->validateFind($filters)) {
+            throw new DataException($this->validator->getError());
+        }
+
+        $roles = $this->rol->find($filters);
 
         if (empty($roles)) {
-            throw new DataException('No hay roles disponibles');
+            if (isset($filters['id_rol'])) {
+                throw new DataException('Rol con id ' . $filters['id_rol'] . ' no encontrado');
+            }
+            if (isset($filters['nombre'])) {
+                throw new DataException('No se encontró ningún rol con el nombre "' . $filters['nombre'] . '"');
+            }
+            throw new DataException('No hay roles disponibles que coincidan con los criterios');
         }
 
         return $roles;
-    }
-
-    public function getById(int $id): ?array
-    {
-        if (!$rol = $this->rol->exists($id)) {
-            throw new DataException('Rol con id '.$id.' no encontrado');
-        }
-        
-        return $this->rol->getById($id);
     }
 }

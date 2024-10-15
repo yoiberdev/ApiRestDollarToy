@@ -13,15 +13,26 @@ try {
     $method = $_SERVER['REQUEST_METHOD'];
     $data = [];
 
+    $id = isset($url[1]) ? (int)$url[1] : null;
+
     switch ($method) {
         case 'GET':
-            // Verificar si se solicita un rol específico
-            if (isset($_GET['id'])) {
-                $data['id'] = (int)$_GET['id'];
-                // echo $controller->handleRequest('getById', $data);
+            $filters = [];
+
+            if ($id) {
+                $filters['id_rol'] = $id;
             } else {
-                echo $controller->handleRequest('get', $data);
+                $allowedFilters = ['search', 'id_rol', 'id', 'nombre'];
+
+                foreach ($allowedFilters as $filter) {
+                    if (isset($_GET[$filter])) {
+                        $filters[$filter === 'id' ? 'id_rol' : $filter] = $filter === 'id' ? (int)$_GET[$filter] : $_GET[$filter];
+                    }
+                }
             }
+
+            $roles = $controller->handleRequest('find', $filters);
+            echo $roles;
             break;
 
         case 'POST':
@@ -31,24 +42,21 @@ try {
             break;
 
         case 'PUT':
-            // Obtener el cuerpo de la solicitud
             $body = json_decode(file_get_contents('php://input'), true);
-            $data['id'] = (int) $body['id'];
+
+            $body['id'] = $id ?? null;
+
             echo $controller->handleRequest('update', $body);
             break;
 
         case 'DELETE':
-            if (isset($_GET['id'])) {
-                $data['id'] = (int) $_GET['id'];
-                echo $controller->handleRequest('delete', $data);
-            } else {
-                http_response_code(400);
-                echo json_encode(['error' => 'ID no proporcionado para eliminar']);
-            }
+            $data['id'] = $id ?? null;
+
+            echo $controller->handleRequest('delete', $data);
             break;
 
         default:
-            http_response_code(405); // Método no permitido
+            http_response_code(405);
             echo json_encode(['error' => 'Método no soportado']);
             break;
     }
