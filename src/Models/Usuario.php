@@ -4,7 +4,7 @@ namespace app\Models;
 
 class Usuario
 {
-    public $id;
-    public $nombre;
+    private $id;
+    private $nombre;
     
 }

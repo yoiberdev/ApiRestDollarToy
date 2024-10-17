@@ -1,6 +1,6 @@
 <?php
 
-use app\Controllers\RolController;
+use app\Controllers\ProductoController;
 use app\Exceptions\ValidationException;
 use app\Exceptions\DataException;
 
@@ -8,7 +8,7 @@ header('Content-Type: application/json');
 
 try {
 
-    $controller = RolController::createInstance();
+    $controller = ProductoController::createInstance();
 
     $method = $_SERVER['REQUEST_METHOD'];
     $data = [];
@@ -17,28 +17,23 @@ try {
 
     switch ($method) {
         case 'GET':
-            $filters = [];
+            $filters = [
+                'id' => isset($_GET['id']) ? (int)$_GET['id'] : $id ?? null,
+                'nombre' => $_GET['nombre'] ?? null,
+                'id_categoria' => isset($_GET['id_categoria']) ? (int)$_GET['id_categoria'] : null,
+                'id_sede' => isset($_GET['id_sede']) ? (int)$_GET['id_sede'] : null,
+                'precio_min' => isset($_GET['precio_min']) ? (float)$_GET['precio_min'] : null,
+                'precio_max' => isset($_GET['precio_max']) ? (float)$_GET['precio_max'] : null
+            ];
 
-            if ($id) {
-                $filters['id_rol'] = $id;
-            } else {
-                $allowedFilters = ['search', 'id_rol', 'id', 'nombre'];
-
-                foreach ($allowedFilters as $filter) {
-                    if (isset($_GET[$filter])) {
-                        $filters[$filter === 'id' ? 'id_rol' : $filter] = $filter === 'id' ? (int)$_GET[$filter] : $_GET[$filter];
-                    }
-                }
-            }
-
-            $roles = $controller->handleRequest('find', $filters);
-            echo $roles;
+            $productos = $controller->handleRequest('find', $filters);
+            echo $productos;
             break;
 
         case 'POST':
-            // Obtener el cuerpo de la solicitud
             $body = json_decode(file_get_contents('php://input'), true);
-            echo $controller->handleRequest('create', $body);
+            $result = $controller->handleRequest('create', $body);
+            echo $result;
             break;
 
         case 'PUT':

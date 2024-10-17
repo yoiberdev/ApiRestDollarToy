@@ -8,9 +8,11 @@ use app\Models\Rol;
 
 class RolRepository extends BaseData implements RolInterface
 {
+    const TABLE = 'tb_rol';
+
     public function create(Rol $rol): bool
     {
-        $sql = "INSERT INTO tb_rol (nombre) VALUES (:nombre)";
+        $sql = "INSERT INTO self::TABLE (nombre) VALUES (:nombre)";
         $stmt = $this->pdo->prepare($sql);
 
         $nombre = $rol->getNombre();
@@ -20,7 +22,7 @@ class RolRepository extends BaseData implements RolInterface
 
     public function update(Rol $rol): void
     {
-        $sql = "UPDATE tb_rol SET nombre = :nombre WHERE id_rol = :id";
+        $sql = "UPDATE " . self::TABLE . " SET nombre = :nombre WHERE id_rol = :id";
         $stmt = $this->pdo->prepare($sql);
         $stmt->bindParam(':nombre', $rol->getNombre(), PDO::PARAM_STR);
         $stmt->bindParam(':id', $rol->getId(), PDO::PARAM_INT);
@@ -29,7 +31,7 @@ class RolRepository extends BaseData implements RolInterface
 
     public function deleteById(int $id): bool
     {
-        $sql = "DELETE FROM tb_rol WHERE id_rol = :id";
+        $sql = "DELETE FROM self::TABLE WHERE id_rol = :id";
         $stmt = $this->pdo->prepare($sql);
         $stmt->bindParam(':id', $id, PDO::PARAM_INT);
         return $stmt->execute();
@@ -37,7 +39,7 @@ class RolRepository extends BaseData implements RolInterface
 
     public function exists(int $id): bool
     {
-        $sql = "SELECT COUNT(*) AS count FROM tb_rol WHERE id_rol = :id";
+        $sql = "SELECT COUNT(*) AS count FROM self::TABLE WHERE id_rol = :id";
         $stmt = $this->pdo->prepare($sql);
         $stmt->bindParam(':id', $id, PDO::PARAM_INT);
         $stmt->execute();
@@ -47,7 +49,7 @@ class RolRepository extends BaseData implements RolInterface
 
     public function find(array $filters): array
     {
-        $sql = "SELECT * FROM tb_rol";
+        $sql = "SELECT * FROM " . self::TABLE;
         $conditions = [];
         $params = [];
 

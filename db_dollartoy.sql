@@ -1,313 +1,166 @@
-CREATE DATABASE db_dollartoy;
+-- phpMyAdmin SQL Dump
+-- version 5.2.1
+-- https://www.phpmyadmin.net/
+--
+-- Servidor: 127.0.0.1
+-- Tiempo de generación: 17-10-2024 a las 23:58:05
+-- Versión del servidor: 10.4.32-MariaDB
+-- Versión de PHP: 8.2.12
 
-USE db_dollartoy;
-
-CREATE TABLE tb_rol (
-    id_rol INT NOT NULL AUTO_INCREMENT PRIMARY KEY,
-    nombre VARCHAR(50)
-);
-
-CREATE TABLE tb_usuario (
-    id_usuario INT NOT NULL AUTO_INCREMENT PRIMARY KEY,
-    nombre VARCHAR(50),
-    apellido VARCHAR(50),
-    email VARCHAR(50),
-    celular INT,
-    contraseña VARCHAR(100),
-    fecha_registro DATETIME,
-    id_usuario_rol INT,
-    FOREIGN KEY (id_usuario_rol) REFERENCES tb_rol(id_rol) ON DELETE CASCADE
-);
-
-CREATE TABLE tb_categoria (
-    id_categoria INT NOT NULL AUTO_INCREMENT PRIMARY KEY,
-    nombre VARCHAR(100),
-    descripcion TEXT
-);
-
-CREATE TABLE tb_producto (
-    id_producto INT NOT NULL AUTO_INCREMENT PRIMARY KEY,
-    nombre VARCHAR(100),
-    descripcion TEXT,
-    precio FLOAT,
-    id_categoria_producto INT NOT NULL,
-    imagen_url VARCHAR(255),
-    FOREIGN KEY (id_categoria_producto) REFERENCES tb_categoria(id_categoria) ON DELETE CASCADE
-);
-
-CREATE TABLE tb_cliente (
-    id_cliente INT NOT NULL AUTO_INCREMENT PRIMARY KEY,
-    nombre VARCHAR(50),
-    apellido VARCHAR(50),
-    email VARCHAR(50),
-    fecha_registro DATETIME
-);
-
-CREATE TABLE tb_sedes (
-    id_sede INT NOT NULL AUTO_INCREMENT PRIMARY KEY,
-    nombre VARCHAR(100),
-    direccion VARCHAR(255),
-    ciudad VARCHAR(100)
-);
-
-CREATE TABLE tb_sedeproducto (
-    id_sedeproducto INT NOT NULL AUTO_INCREMENT PRIMARY KEY,
-    id_sede INT NOT NULL,
-    id_producto INT NOT NULL,
-    stock_disponible INT,
-    FOREIGN KEY (id_sede) REFERENCES tb_sedes(id_sede),
-    FOREIGN KEY (id_producto) REFERENCES tb_producto(id_producto) ON DELETE CASCADE
-);
-
-CREATE TABLE tb_metodo_pago (
-    id_metodopago INT NOT NULL AUTO_INCREMENT PRIMARY KEY,
-    nombre VARCHAR(50)
-);
-
-CREATE TABLE tb_venta (
-    id_venta INT NOT NULL AUTO_INCREMENT PRIMARY KEY,
-    id_venta_usuario INT,
-    id_venta_cliente INT,
-    cantidad INT,
-    fecha_venta DATETIME,
-    id_metodopago_venta INT,
-    total FLOAT,
-    FOREIGN KEY (id_venta_cliente) REFERENCES tb_cliente(id_cliente) ON DELETE CASCADE,
-    FOREIGN KEY (id_metodopago_venta) REFERENCES tb_metodo_pago(id_metodopago) ON DELETE CASCADE,
-    FOREIGN KEY (id_venta_usuario) REFERENCES tb_usuario(id_usuario) ON DELETE CASCADE
-);
-
-CREATE TABLE tb_detalle_venta (
-    id_detalle_venta INT NOT NULL AUTO_INCREMENT PRIMARY KEY,
-    id_venta INT NOT NULL,
-    id_producto INT NOT NULL,
-    cantidad INT NOT NULL,
-    precio_unitario FLOAT NOT NULL,
-    FOREIGN KEY (id_venta) REFERENCES tb_venta(id_venta) ON DELETE CASCADE,
-    FOREIGN KEY (id_producto) REFERENCES tb_producto(id_producto) ON DELETE CASCADE
-);
+SET SQL_MODE = "NO_AUTO_VALUE_ON_ZERO";
+START TRANSACTION;
+SET time_zone = "+00:00";
 
 
-/*------------------------------------------------
---------------------------------------------------
--- INSERCIONES
---------------------------------------------------
---------------------------------------------------*/
+/*!40101 SET @OLD_CHARACTER_SET_CLIENT=@@CHARACTER_SET_CLIENT */;
+/*!40101 SET @OLD_CHARACTER_SET_RESULTS=@@CHARACTER_SET_RESULTS */;
+/*!40101 SET @OLD_COLLATION_CONNECTION=@@COLLATION_CONNECTION */;
+/*!40101 SET NAMES utf8mb4 */;
 
--- Insertar filas en la tabla tb_rol
--- INSERT INTO tb_rol (nombre) VALUES
--- ('Administrador'),
--- ('Vendedor');
+--
+-- Base de datos: `db_dollartoy`
+--
+CREATE DATABASE IF NOT EXISTS `db_dollartoy` DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci;
+USE `db_dollartoy`;
 
--- -- Insertar filas en la tabla tb_usuario
--- INSERT INTO tb_usuario (nombre, apellido, email, celular, contraseña, fecha_registro, id_usuario_rol) VALUES
--- ('Juan', 'Pérez', 'juan.perez@example.com', 987654321, 'contraseña1', NOW(), 1),
--- ('Ana', 'Gómez', 'ana.gomez@example.com', 976543210, 'contraseña2', NOW(), 1),
--- ('Luis', 'Fernández', 'luis.fernandez@example.com', 965432109, 'contraseña3', NOW(), 2),
--- ('Marta', 'Díaz', 'marta.diaz@example.com', 954321098, 'contraseña4', NOW(), 2),
--- ('Carlos', 'Martínez', 'carlos.martinez@example.com', 943210987, 'contraseña5', NOW(), 1),
--- ('Sofía', 'López', 'sofia.lopez@example.com', 932109876, 'contraseña6', NOW(), 2),
--- ('Jorge', 'Sánchez', 'jorge.sanchez@example.com', 921098765, 'contraseña7', NOW(), 2),
--- ('Isabel', 'Torres', 'isabel.torres@example.com', 910987654, 'contraseña8', NOW(), 1),
--- ('Fernando', 'Ramírez', 'fernando.ramirez@example.com', 909876543, 'contraseña9', NOW(), 2),
--- ('Patricia', 'Vargas', 'patricia.vargas@example.com', 898765432, 'contraseña10', NOW(), 1),
--- ('Diego', 'Reyes', 'diego.reyes@example.com', 887654321, 'contraseña11', NOW(), 2),
--- ('Verónica', 'Jiménez', 'veronica.jimenez@example.com', 876543210, 'contraseña12', NOW(), 1),
--- ('Andrés', 'Hernández', 'andres.hernandez@example.com', 865432109, 'contraseña13', NOW(), 2),
--- ('Laura', 'Mendoza', 'laura.mendoza@example.com', 854321098, 'contraseña14', NOW(), 1),
--- ('Rafael', 'Salazar', 'rafael.salazar@example.com', 843210987, 'contraseña15', NOW(), 2);
+DELIMITER $$
+--
+-- Procedimientos
+--
+DROP PROCEDURE IF EXISTS `sp_guardar_cliente`$$
+CREATE DEFINER=`root`@`localhost` PROCEDURE `sp_guardar_cliente` (IN `p_id_cliente` INT, IN `p_nombre` VARCHAR(50), IN `p_apellido` VARCHAR(50), IN `p_email` VARCHAR(50))   BEGIN
+    IF p_id_cliente = 0 THEN
+        INSERT INTO tb_cliente (nombre, apellido, email, fecha_registro)
+        VALUES (p_nombre, p_apellido, p_email, NOW());
 
--- -- Insertar filas en la tabla tb_categoria
--- INSERT INTO tb_categoria (nombre, descripcion) VALUES
--- ('Muñecas', 'Diversas muñecas de diferentes estilos.'),
--- ('Juguetes de construcción', 'Bloques y sets de construcción.'),
--- ('Autos', 'Autos de juguete para coleccionar.'),
--- ('Juegos de mesa', 'Juegos de mesa para toda la familia.'),
--- ('Pelotas', 'Pelotas de diferentes tamaños y usos.'),
--- ('Rompecabezas', 'Rompecabezas de varias piezas y temáticas.'),
--- ('Dinosaurios', 'Figuras de dinosaurios de diferentes tamaños.'),
--- ('Juguetes educativos', 'Juguetes que enseñan mientras juegan.'),
--- ('Accesorios', 'Accesorios para muñecas y figuras.'),
--- ('Bicicletas', 'Bicicletas de juguete y accesorios.');
+    ELSE
+        UPDATE tb_cliente
+        SET nombre = p_nombre,
+            apellido = p_apellido,
+            email = p_email
+        WHERE id_cliente = p_id_cliente;
+    END IF;
+END$$
 
--- -- Insertar filas en la tabla tb_producto
--- INSERT INTO tb_producto (nombre, descripcion, precio, id_categoria_producto, imagen_url) VALUES
--- ('Muñeca de trapo', 'Muñeca suave y amigable.', 29.99, 1, 'http://ejemplo.com/muñeca1.jpg'),
--- ('Set de bloques', 'Juego de bloques de construcción.', 39.99, 2, 'http://ejemplo.com/bloques1.jpg'),
--- ('Auto de carreras', 'Auto de juguete rápido.', 15.50, 3, 'http://ejemplo.com/auto1.jpg'),
--- ('Juego de mesa', 'Juego de mesa clásico.', 25.00, 4, 'http://ejemplo.com/juego1.jpg'),
--- ('Pelota de fútbol', 'Pelota para jugar al fútbol.', 12.99, 5, 'http://ejemplo.com/pelota1.jpg'),
--- ('Rompecabezas 500 piezas', 'Rompecabezas de paisaje.', 19.99, 6, 'http://ejemplo.com/rompecabezas1.jpg'),
--- ('Dinosaurio de juguete', 'Figura de dinosaurio T-Rex.', 10.50, 7, 'http://ejemplo.com/dinosaurio1.jpg'),
--- ('Juego educativo', 'Juego para aprender matemáticas.', 22.50, 8, 'http://ejemplo.com/juego_educativo1.jpg'),
--- ('Accesorio de muñeca', 'Vestido para muñecas.', 7.50, 9, 'http://ejemplo.com/accesorio1.jpg'),
--- ('Bicicleta de juguete', 'Bicicleta de juguete para niños.', 49.99, 10, 'http://ejemplo.com/bicicleta1.jpg'),
--- ('Muñeca Barbie', 'Muñeca icónica Barbie.', 35.00, 1, 'http://ejemplo.com/muñeca2.jpg'),
--- ('Set de construcción', 'Set para construir un castillo.', 45.99, 2, 'http://ejemplo.com/set_construccion.jpg'),
--- ('Camión de juguete', 'Camión grande para jugar.', 27.00, 3, 'http://ejemplo.com/camion1.jpg'),
--- ('Juego de cartas', 'Juego de cartas para divertirse.', 18.00, 4, 'http://ejemplo.com/juego_cartas.jpg'),
--- ('Pelota de baloncesto', 'Pelota para jugar baloncesto.', 15.00, 5, 'http://ejemplo.com/pelota_baloncesto.jpg');
+DROP PROCEDURE IF EXISTS `sp_guardar_producto`$$
+CREATE DEFINER=`root`@`localhost` PROCEDURE `sp_guardar_producto` (IN `p_id_producto` INT, IN `p_nombre` VARCHAR(255), IN `p_descripcion` TEXT, IN `p_precio` DECIMAL(10,2), IN `p_imagen` VARCHAR(255), IN `p_id_categoria_producto` INT, IN `p_id_sede` INT, IN `p_stock_disponible` INT)   BEGIN
+    DECLARE v_id_producto INT;
 
--- -- Insertar filas en la tabla tb_cliente
--- INSERT INTO tb_cliente (nombre, apellido, email, fecha_registro) VALUES
--- ('Pedro', 'García', 'pedro.garcia@example.com', NOW()),
--- ('Clara', 'Mora', 'clara.mora@example.com', NOW()),
--- ('Ricardo', 'Zamora', 'ricardo.zamora@example.com', NOW()),
--- ('Elena', 'López', 'elena.lopez@example.com', NOW()),
--- ('Felipe', 'Paz', 'felipe.paz@example.com', NOW()),
--- ('Gloria', 'Ortega', 'gloria.ortega@example.com', NOW()),
--- ('Mario', 'Soto', 'mario.soto@example.com', NOW()),
--- ('Victoria', 'Alonso', 'victoria.alonso@example.com', NOW()),
--- ('Santiago', 'Mendoza', 'santiago.mendoza@example.com', NOW()),
--- ('Rosa', 'Cruz', 'rosa.cruz@example.com', NOW()),
--- ('Tomás', 'Salinas', 'tomas.salinas@example.com', NOW()),
--- ('Patricia', 'Guerrero', 'patricia.guerrero@example.com', NOW()),
--- ('Roberto', 'Pérez', 'roberto.perez@example.com', NOW()),
--- ('Camila', 'Fernández', 'camila.fernandez@example.com', NOW()),
--- ('Alejandro', 'Rojas', 'alejandro.rojas@example.com', NOW());
+    -- Si p_id_producto es 0, significa que es una creación
+    IF p_id_producto = 0 THEN
+        INSERT INTO tb_producto (nombre, descripcion, precio, imagen_url, id_categoria_producto)
+        VALUES (p_nombre, p_descripcion, p_precio, p_imagen, p_id_categoria_producto);
+        
+        SET v_id_producto = LAST_INSERT_ID();
 
--- -- Insertar filas en la tabla tb_sedes
--- INSERT INTO tb_sedes (nombre, direccion, ciudad) VALUES
--- ('Sede Central', 'Av. Principal 123', 'Lima'),
--- ('Sede Sur', 'Av. Sur 456', 'Lima'),
--- ('Sede Norte', 'Av. Norte 789', 'Lima'),
--- ('Sede Este', 'Av. Este 321', 'Lima');
+    ELSE
+        UPDATE tb_producto
+        SET nombre = p_nombre,
+            descripcion = p_descripcion,
+            precio = p_precio,
+            imagen_url = p_imagen,  -- Actualiza la imagen si existe
+            id_categoria_producto = p_id_categoria_producto
+        WHERE id_producto = p_id_producto;
+        
+        SET v_id_producto = p_id_producto;
+    END IF;
 
--- -- Insertar filas en la tabla tb_sedeproducto
--- INSERT INTO tb_sedeproducto (id_sedeproducto, id_sede, id_producto,stock_disponible) VALUES
--- ('SP001', 'S001', 'P001', 5),
--- ('SP002', 'S001', 'P002', 21),
--- ('SP003', 'S001', 'P003', 32),
--- ('SP004', 'S001', 'P004', 21),
--- ('SP005', 'S001', 'P005', 25),
--- ('SP006', 'S002', 'P006', 33),
--- ('SP007', 'S002', 'P007', 51),
--- ('SP008', 'S002', 'P008', 37),
--- ('SP009', 'S003', 'P009', 20),
--- ('SP010', 'S003', 'P010', 48),
--- ('SP011', 'S004', 'P011', 11),
--- ('SP012', 'S004', 'P012', 22),
--- ('SP013', 'S001', 'P013', 31),
--- ('SP014', 'S002', 'P014', 29),
--- ('SP015', 'S003', 'P015', 18),
--- ('SP016', 'S004', 'P001', 23),
--- ('SP017', 'S004', 'P002', 34),
--- ('SP018', 'S003', 'P003', 40),
--- ('SP019', 'S002', 'P004', 10),
--- ('SP020', 'S001', 'P005', 5),
--- ('SP021', 'S002', 'P006', 15),
--- ('SP022', 'S003', 'P007', 20),
--- ('SP023', 'S004', 'P008', 10),
--- ('SP024', 'S001', 'P009', 35),
--- ('SP025', 'S002', 'P010', 20);
+    -- Actualiza o inserta en la tabla intermedia tb_sede_producto
+    INSERT INTO tb_sedeproducto (id_producto, id_sede, stock_disponible)
+    VALUES (v_id_producto, p_id_sede, p_stock_disponible)
+    ON DUPLICATE KEY UPDATE stock_disponible = p_stock_disponible;
+END$$
 
--- -- Insertar filas en la tabla tb_metodo_pago
--- INSERT INTO tb_metodo_pago (nombre) VALUES
--- ('Yape'),
--- ('Plin'),
--- ('Efectivo'),
--- ('Transferencia');
+DROP PROCEDURE IF EXISTS `sp_guardar_rol`$$
+CREATE DEFINER=`root`@`localhost` PROCEDURE `sp_guardar_rol` (IN `p_id_rol` INT, IN `p_nombre` VARCHAR(50))   BEGIN
+    IF p_id_rol = 0 THEN
+        INSERT INTO tb_rol (nombre)
+        VALUES (p_nombre);
 
--- -- Insertar filas en la tabla tb_venta
--- INSERT INTO tb_venta (id_venta, id_venta_usuario, id_venta_cliente, cantidad, fecha_venta, id_metodopago_venta, total) VALUES
--- ('V001', 'U003', 'C001', 1, NOW(), 'M01', 59.98),
--- ('V002', 'U004', 'C002', 1, NOW(), 'M02', 39.99),
--- ('V003', 'U006', 'C003', 1, NOW(), 'M03', 15.50),
--- ('V004', 'U007', 'C004', 1, NOW(), 'M04', 25.00),
--- ('V005', 'U003', 'C005', 1, NOW(), 'M01', 12.99),
--- ('V006', 'U004', 'C006', 1, NOW(), 'M02', 19.99),
--- ('V007', 'U006', 'C007', 1, NOW(), 'M03', 10.50),
--- ('V008', 'U007', 'C008', 1, NOW(), 'M04', 22.50),
--- ('V009', 'U003', 'C009', 1, NOW(), 'M01', 7.50),
--- ('V010', 'U004', 'C010', 1, NOW(), 'M02', 49.99),
--- ('V011', 'U006', 'C011', 1, NOW(), 'M03', 35.00),
--- ('V012', 'U007', 'C012', 1, NOW(), 'M04', 45.99),
--- ('V013', 'U003', 'C013', 1, NOW(), 'M01', 27.00),
--- ('V014', 'U004', 'C014', 1, NOW(), 'M02', 18.00),
--- ('V015', 'U006', 'C015', 1, NOW(), 'M03', 15.00);
+    ELSE
+        UPDATE tb_rol
+        SET nombre = p_nombre
+        WHERE id_rol = p_id_rol;
+    END IF;
+END$$
 
--- -- Insertar filas en la tabla tb_detalle_venta
--- INSERT INTO tb_detalle_venta (id_detalle_venta, id_venta, id_producto, cantidad, precio_unitario) VALUES
--- ('DV001', 'V001', 'P001', 1, 29.99),
--- ('DV002', 'V001', 'P002', 1, 39.99),
--- ('DV003', 'V002', 'P003', 1, 15.50),
--- ('DV004', 'V002', 'P004', 1, 25.00),
--- ('DV005', 'V003', 'P005', 1, 12.99),
--- ('DV006', 'V004', 'P006', 1, 19.99),
--- ('DV007', 'V005', 'P007', 1, 10.50),
--- ('DV008', 'V006', 'P008', 1, 22.50),
--- ('DV009', 'V007', 'P009', 1, 7.50),
--- ('DV010', 'V008', 'P010', 1, 49.99),
--- ('DV011', 'V009', 'P011', 1, 35.00),
--- ('DV012', 'V010', 'P012', 1, 45.99),
--- ('DV013', 'V011', 'P013', 1, 27.00),
--- ('DV014', 'V012', 'P014', 1, 18.00),
--- ('DV015', 'V013', 'P015', 1, 15.00),
--- ('DV016', 'V014', 'P001', 1, 29.99),
--- ('DV017', 'V015', 'P002', 1, 39.99),
--- ('DV018', 'V001', 'P003', 1, 15.50),
--- ('DV019', 'V002', 'P004', 1, 25.00),
--- ('DV020', 'V003', 'P005', 1, 12.99),
--- ('DV021', 'V004', 'P006', 1, 19.99),
--- ('DV022', 'V005', 'P007', 1, 10.50),
--- ('DV023', 'V006', 'P008', 1, 22.50),
--- ('DV024', 'V007', 'P009', 1, 7.50),
--- ('DV025', 'V008', 'P010', 1, 49.99);
+DROP PROCEDURE IF EXISTS `sp_guardar_sede`$$
+CREATE DEFINER=`root`@`localhost` PROCEDURE `sp_guardar_sede` (IN `p_id_sede` INT, IN `p_nombre` VARCHAR(100), IN `p_direccion` VARCHAR(255), IN `p_ciudad` VARCHAR(100))   BEGIN
+    IF p_id_sede = 0 THEN
+        INSERT INTO tb_sedes (nombre, direccion, ciudad)
+        VALUES (p_nombre, p_direccion, p_ciudad);
 
-/*------------------------------------------------
---------------------------------------------------
--- PROCEDIMIENTOS LISTAR
---------------------------------------------------
---------------------------------------------------*/
+    ELSE
+        UPDATE tb_sedes
+        SET nombre = p_nombre,
+            direccion = p_direccion,
+            ciudad = p_ciudad
+        WHERE id_sede = p_id_sede;
+    END IF;
+END$$
 
--- CLIENTES
-DELIMITER //
-CREATE PROCEDURE sp_ListarCliente()
-BEGIN
-    SELECT nombre, apellido, email, fecha_registro
-    FROM tb_cliente;
-END //
-DELIMITER ;
+DROP PROCEDURE IF EXISTS `sp_guardar_usuario`$$
+CREATE DEFINER=`root`@`localhost` PROCEDURE `sp_guardar_usuario` (IN `p_id_usuario` INT, IN `p_nombre` VARCHAR(50), IN `p_apellido` VARCHAR(50), IN `p_email` VARCHAR(50), IN `p_celular` INT, IN `p_contraseña` VARCHAR(100), IN `p_id_usuario_rol` INT)   BEGIN
+    IF p_id_usuario = 0 THEN
+        INSERT INTO tb_usuario (nombre, apellido, email, celular, contraseña, fecha_registro, id_usuario_rol)
+        VALUES (p_nombre, p_apellido, p_email, p_celular, SHA2(p_contraseña, 256), NOW(), p_id_usuario_rol);
 
--- PRODUCTOS
-DELIMITER //
-CREATE PROCEDURE sp_ListarProducto()
-BEGIN
-    SELECT p.nombre AS nombre_producto, 
-           p.descripcion, 
-           p.precio, 
-           c.nombre AS categoria
-    FROM tb_producto p
-    JOIN tb_categoria c ON p.id_categoria_producto = c.id_categoria;
-END //
-DELIMITER ;
+    ELSE
+        UPDATE tb_usuario
+        SET nombre = p_nombre,
+            apellido = p_apellido,
+            email = p_email,
+            celular = p_celular,
+            id_usuario_rol = p_id_usuario_rol
+        WHERE id_usuario = p_id_usuario;
 
+        IF p_contraseña IS NOT NULL AND p_contraseña != '' THEN
+            UPDATE tb_usuario
+            SET contraseña = SHA2(p_contraseña, 256)
+            WHERE id_usuario = p_id_usuario;
+        END IF;
+    END IF;
+END$$
 
--- USUARIOS				MUESTRA TODOS LOS USUARIOS SI ES NULL O A ALGUNOS USUARIOS SI SE ESPECIFÍCA EL ID
-DELIMITER //
-CREATE PROCEDURE sp_ListarUsuarios(IN p_id_rol INT)
-BEGIN
-    SELECT u.nombre, 
-           u.apellido, 
-           u.email, 
-           u.celular, 
-           DATE(u.fecha_registro) AS fecha_registro, 
-           r.nombre AS rol
-    FROM tb_usuario u
-    JOIN tb_rol r ON u.id_usuario_rol = r.id_rol
-    WHERE (p_id_rol IS NULL OR u.id_usuario_rol = p_id_rol);
-END //
-DELIMITER ;
+DROP PROCEDURE IF EXISTS `sp_ListarProductoxSede`$$
+CREATE DEFINER=`root`@`localhost` PROCEDURE `sp_ListarProductoxSede` (IN `p_id_sede` INT)   BEGIN
+    SELECT 
+        p.nombre AS nombre_producto,
+        p.descripcion,
+        p.precio,
+        c.nombre AS categoria,
+        sp.stock_disponible
+    FROM 
+        tb_sedeproducto sp
+    JOIN 
+        tb_producto p ON sp.id_producto = p.id_producto
+    JOIN 
+        tb_categoria c ON p.id_categoria_producto = c.id_categoria
+    WHERE 
+        sp.id_sede = p_id_sede;
+END$$
 
--- EJEMPLOS
--- CALL sp_ListarUsuarios(NULL);
--- CALL sp_ListarUsuarios('R01');
+DROP PROCEDURE IF EXISTS `sp_ListarVentaDetalle`$$
+CREATE DEFINER=`root`@`localhost` PROCEDURE `sp_ListarVentaDetalle` (IN `p_id_cliente` INT)   BEGIN
+    SELECT 
+        v.id_venta,
+        v.fecha_venta,
+        p.nombre AS nombre_producto,
+        dv.cantidad,
+        dv.precio_unitario,
+        (dv.cantidad * dv.precio_unitario) AS total
+    FROM 
+        tb_venta v
+    JOIN 
+        tb_detalle_venta dv ON v.id_venta = dv.id_venta
+    JOIN 
+        tb_producto p ON dv.id_producto = p.id_producto
+    WHERE 
+        v.id_venta_cliente = p_id_cliente;
+END$$
 
-
--- VENTA				MUESTRA TODAS LAS VENTAS REALIZADAS Y EL NOMBRE DEL VENDEDOR
-DELIMITER //
-CREATE PROCEDURE sp_ListarVentas()
-BEGIN
+DROP PROCEDURE IF EXISTS `sp_ListarVentas`$$
+CREATE DEFINER=`root`@`localhost` PROCEDURE `sp_ListarVentas` ()   BEGIN
     SELECT 
         CONCAT(c.nombre, ' ', c.apellido) AS nombre_cliente,
         CONCAT(u.nombre, ' ', u.apellido) AS nombre_vendedor,
@@ -326,133 +179,474 @@ BEGIN
         tb_usuario u ON v.id_venta_usuario = u.id_usuario
     JOIN 
         tb_metodo_pago m ON v.id_metodopago_venta = m.id_metodopago;
-END //
-DELIMITER ;
+END$$
 
-
--- VENTA DETALLE       MUESTRA LAS VENTAS QUE SE REALIZARON A UN CLIENTE
-DELIMITER //
-CREATE PROCEDURE sp_ListarVentaDetalle(IN p_id_cliente INT)
-BEGIN
+DROP PROCEDURE IF EXISTS `sp_listar_categoria`$$
+CREATE DEFINER=`root`@`localhost` PROCEDURE `sp_listar_categoria` (IN `p_id_categoria` INT, IN `p_nombre` VARCHAR(255))   BEGIN
     SELECT 
-        v.id_venta,
-        v.fecha_venta,
-        p.nombre AS nombre_producto,
-        dv.cantidad,
-        dv.precio_unitario,
-        (dv.cantidad * dv.precio_unitario) AS total
+        c.id_categoria,
+        c.nombre,
+        c.descripcion
     FROM 
-        tb_venta v
-    JOIN 
-        tb_detalle_venta dv ON v.id_venta = dv.id_venta
-    JOIN 
-        tb_producto p ON dv.id_producto = p.id_producto
-    WHERE 
-        v.id_venta_cliente = p_id_cliente;
-END //
-DELIMITER ;
+        tb_categoria c
+    WHERE
+        (p_id_categoria IS NULL OR c.id_categoria = p_id_categoria) AND
+        (p_nombre IS NULL OR c.nombre LIKE CONCAT('%', p_nombre, '%'));
+END$$
 
--- EJEMPLOS 
--- call sp_ListarVentaDetalle("C001")
-
--- PRODUCTOXSEDE 	MUESTRA LOS PRODUCTOS DEPENDIENDO A QUE SEDE HACEMOS REFERENCIA
-DELIMITER //
-CREATE PROCEDURE sp_ListarProductoxSede(IN p_id_sede INT)
-BEGIN
+DROP PROCEDURE IF EXISTS `sp_listar_cliente`$$
+CREATE DEFINER=`root`@`localhost` PROCEDURE `sp_listar_cliente` (IN `p_id_cliente` INT, IN `p_nombre` VARCHAR(255), IN `p_apellido` VARCHAR(255), IN `p_email` VARCHAR(255))   BEGIN
     SELECT 
-        p.nombre AS nombre_producto,
+        c.id_cliente,
+        c.nombre, 
+        c.apellido, 
+        c.email, 
+        DATE(c.fecha_registro) AS fecha_registro
+    FROM 
+        tb_cliente c
+    WHERE 
+        (p_id_cliente IS NULL OR c.id_cliente = p_id_cliente) AND
+        (p_nombre IS NULL OR c.nombre LIKE CONCAT('%', p_nombre, '%')) AND
+        (p_apellido IS NULL OR c.apellido LIKE CONCAT('%', p_apellido, '%')) AND
+        (p_email IS NULL OR c.email LIKE CONCAT('%', p_email, '%'));
+END$$
+
+DROP PROCEDURE IF EXISTS `sp_listar_producto`$$
+CREATE DEFINER=`root`@`localhost` PROCEDURE `sp_listar_producto` (IN `p_id_producto` INT, IN `p_nombre` VARCHAR(255), IN `p_id_categoria_producto` INT, IN `p_id_sede` INT, IN `p_precio_min` DECIMAL(10,2), IN `p_precio_max` DECIMAL(10,2))   BEGIN
+    SELECT 
+        p.id_producto,
+        p.nombre,
         p.descripcion,
         p.precio,
-        c.nombre AS categoria,
+        p.imagen_url,
+        p.id_categoria_producto,
+        sp.id_sede,
         sp.stock_disponible
     FROM 
-        tb_sedeproducto sp
+        tb_producto p
+    LEFT JOIN 
+        tb_sedeproducto sp ON p.id_producto = sp.id_producto
+    WHERE
+        (p_id_producto IS NULL OR p.id_producto = p_id_producto) AND
+        (p_nombre IS NULL OR p.nombre LIKE CONCAT('%', p_nombre, '%')) AND
+        (p_id_categoria_producto IS NULL OR p.id_categoria_producto = p_id_categoria_producto) AND
+        (p_id_sede IS NULL OR sp.id_sede = p_id_sede) AND
+        (p_precio_min IS NULL OR p.precio >= p_precio_min) AND
+        (p_precio_max IS NULL OR p.precio <= p_precio_max);
+END$$
+
+DROP PROCEDURE IF EXISTS `sp_listar_rol`$$
+CREATE DEFINER=`root`@`localhost` PROCEDURE `sp_listar_rol` (IN `p_id_rol` INT, IN `p_nombre` VARCHAR(50))   BEGIN
+    SELECT 
+        r.id_rol,
+        r.nombre
+    FROM 
+        tb_rol r
+    WHERE
+        (p_id_rol IS NULL OR r.id_rol = p_id_rol) AND
+        (p_nombre IS NULL OR r.nombre LIKE CONCAT('%', p_nombre, '%'));
+END$$
+
+DROP PROCEDURE IF EXISTS `sp_listar_usuario`$$
+CREATE DEFINER=`root`@`localhost` PROCEDURE `sp_listar_usuario` (IN `p_id_usuario` INT, IN `p_nombre` VARCHAR(255), IN `p_apellido` VARCHAR(255), IN `p_email` VARCHAR(255), IN `p_id_rol` INT)   BEGIN
+    SELECT 
+        u.id_usuario,
+        u.nombre, 
+        u.apellido, 
+        u.email, 
+        u.celular, 
+        DATE(u.fecha_registro) AS fecha_registro, 
+        r.nombre AS rol
+    FROM 
+        tb_usuario u
     JOIN 
-        tb_producto p ON sp.id_producto = p.id_producto
-    JOIN 
-        tb_categoria c ON p.id_categoria_producto = c.id_categoria
+        tb_rol r ON u.id_usuario_rol = r.id_rol
     WHERE 
-        sp.id_sede = p_id_sede;
-END //
+        (p_id_usuario IS NULL OR u.id_usuario = p_id_usuario) AND
+        (p_nombre IS NULL OR u.nombre LIKE CONCAT('%', p_nombre, '%')) AND
+        (p_apellido IS NULL OR u.apellido LIKE CONCAT('%', p_apellido, '%')) AND
+        (p_email IS NULL OR u.email LIKE CONCAT('%', p_email, '%')) AND
+        (p_id_rol IS NULL OR u.id_usuario_rol = p_id_rol);
+END$$
+
 DELIMITER ;
 
--- EJEMPLOS
--- call sp_ListarProductoxSede("S001");
+-- --------------------------------------------------------
 
+--
+-- Estructura de tabla para la tabla `tb_categoria`
+--
 
-/*------------------------------------------------
---------------------------------------------------
--- PROCEDIMIENTOS CREAR
---------------------------------------------------
---------------------------------------------------*/
+DROP TABLE IF EXISTS `tb_categoria`;
+CREATE TABLE `tb_categoria` (
+  `id_categoria` int(11) NOT NULL,
+  `nombre` varchar(100) DEFAULT NULL,
+  `descripcion` text DEFAULT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
--- CLIENTE			CREA UN NUEVO CLIENTE
+--
+-- Volcado de datos para la tabla `tb_categoria`
+--
 
-DELIMITER //
-CREATE PROCEDURE sp_CrearCliente(
-    IN p_nombre VARCHAR(50),
-    IN p_apellido VARCHAR(50),
-    IN p_email VARCHAR(50)
-)
-BEGIN
-    INSERT INTO tb_cliente (nombre, apellido, email, fecha_registro)
-    VALUES (p_nombre, p_apellido, p_email, NOW());
-END //
-DELIMITER ;
+INSERT INTO `tb_categoria` (`id_categoria`, `nombre`, `descripcion`) VALUES
+(1, 'Comida', 'Alimentos'),
+(2, 'Comida', 'Alimentos'),
+(3, 'Comida', 'Alimentos'),
+(4, 'Comida', 'Alimentos varios'),
+(5, 'Comida', 'Alimentos varios'),
+(6, 'Comida', 'Alimentos varios');
 
--- CALL sp_CrearCliente('Juan', 'Pérez', 'juan.perez@example.com');
+-- --------------------------------------------------------
 
+--
+-- Estructura de tabla para la tabla `tb_cliente`
+--
 
--- PRODUCTO 		CREA UN NUEVO PRODUCTO
-DELIMITER //
-CREATE PROCEDURE sp_CrearProducto(
-    IN p_nombre VARCHAR(100),
-    IN p_descripcion TEXT,
-    IN p_precio FLOAT,
-    IN p_id_categoria_producto INT,
-    IN p_imagen_url VARCHAR(255),
-    IN p_id_sede INT,
-    IN p_stock_disponible INT
-)
-BEGIN
-    -- Declarar la variable para almacenar el último ID generado
-    DECLARE last_id_producto INT;
+DROP TABLE IF EXISTS `tb_cliente`;
+CREATE TABLE `tb_cliente` (
+  `id_cliente` int(11) NOT NULL,
+  `nombre` varchar(50) DEFAULT NULL,
+  `apellido` varchar(50) DEFAULT NULL,
+  `email` varchar(50) DEFAULT NULL,
+  `fecha_registro` datetime DEFAULT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
-    -- Insertar el nuevo producto en la tabla
-    INSERT INTO tb_producto (nombre, descripcion, precio, id_categoria_producto, imagen_url) 
-    VALUES (p_nombre, p_descripcion, p_precio, p_id_categoria_producto, p_imagen_url);
+-- --------------------------------------------------------
 
-    -- Obtener el último id_producto generado automáticamente
-    SET last_id_producto = LAST_INSERT_ID();
+--
+-- Estructura de tabla para la tabla `tb_detalle_venta`
+--
 
-    -- Insertar en la tabla tb_sedeproducto
-    INSERT INTO tb_sedeproducto (id_sede, id_producto, stock_disponible)
-    VALUES (p_id_sede, last_id_producto, p_stock_disponible);
-END //
-DELIMITER ;
+DROP TABLE IF EXISTS `tb_detalle_venta`;
+CREATE TABLE `tb_detalle_venta` (
+  `id_detalle_venta` int(11) NOT NULL,
+  `id_venta` int(11) NOT NULL,
+  `id_producto` int(11) NOT NULL,
+  `cantidad` int(11) NOT NULL,
+  `precio_unitario` float NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
--- EJEMPLOS
--- CALL sp_CrearProducto('hola', 'holadescripcion', 29.99, 'C001', 'http://ejemplo.com/imagen.jpg', 'S001', 100);
+-- --------------------------------------------------------
 
+--
+-- Estructura de tabla para la tabla `tb_metodo_pago`
+--
 
--- USUARIO 			CREA UN NUEVO USUARIO Y ENCRIPTA SU CONTRASEÑA
+DROP TABLE IF EXISTS `tb_metodo_pago`;
+CREATE TABLE `tb_metodo_pago` (
+  `id_metodopago` int(11) NOT NULL,
+  `nombre` varchar(50) DEFAULT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
-DELIMITER //
-CREATE PROCEDURE sp_CrearUsuario(
-    IN p_nombre VARCHAR(50),
-    IN p_apellido VARCHAR(50),
-    IN p_email VARCHAR(50),
-    IN p_celular INT,
-    IN p_contraseña VARCHAR(100),
-    IN p_id_usuario_rol INT
-)
-BEGIN
-    -- Insertar el nuevo usuario en la tabla con la contraseña encriptada
-    INSERT INTO tb_usuario (nombre, apellido, email, celular, contraseña, fecha_registro, id_usuario_rol)
-    VALUES (p_nombre, p_apellido, p_email, p_celular, SHA2(p_contraseña, 256), NOW(), p_id_usuario_rol);
-END //
-DELIMITER ;
+-- --------------------------------------------------------
 
--- EJEMPLOS
--- CALL sp_CrearUsuario('Juan', 'Pérez', 'juan.perez@example.com', 987654321, 'contraseña_segura', 'R02');
+--
+-- Estructura de tabla para la tabla `tb_producto`
+--
 
+DROP TABLE IF EXISTS `tb_producto`;
+CREATE TABLE `tb_producto` (
+  `id_producto` int(11) NOT NULL,
+  `nombre` varchar(100) DEFAULT NULL,
+  `descripcion` text DEFAULT NULL,
+  `precio` float DEFAULT NULL,
+  `id_categoria_producto` int(11) NOT NULL,
+  `imagen_url` varchar(255) DEFAULT NULL,
+  `stock_disponible` varchar(255) NOT NULL DEFAULT 'NULL' COMMENT 'EMPTY'
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Volcado de datos para la tabla `tb_producto`
+--
+
+INSERT INTO `tb_producto` (`id_producto`, `nombre`, `descripcion`, `precio`, `id_categoria_producto`, `imagen_url`, `stock_disponible`) VALUES
+(1, 'rompecabezas', 'piezas de rompecabezas', 100, 1, 'wwwww.png', 'NULL'),
+(2, 'Producto Nuevo', 'Este es un producto editado 2', 49.99, 1, 'https://ejemplo.com/imagen.jpg', '100'),
+(3, 'Producto Nuevo', 'Este es un producto editado 2', 49.99, 1, 'https://ejemplo.com/imagen.jpg', 'NULL'),
+(4, 'Producto Nuevo', 'Este es un producto nuevo', 49.99, 1, 'https://ejemplo.com/imagen.jpg', 'NULL'),
+(5, 'Producto Nuevo', 'Este es un producto nuevo', 49.99, 1, 'https://ejemplo.com/imagen.jpg', 'NULL'),
+(6, 'Producto Nuevo', 'Este es un producto nuevo', 49.99, 1, 'https://ejemplo.com/imagen.jpg', 'NULL');
+
+-- --------------------------------------------------------
+
+--
+-- Estructura de tabla para la tabla `tb_rol`
+--
+
+DROP TABLE IF EXISTS `tb_rol`;
+CREATE TABLE `tb_rol` (
+  `id_rol` int(11) NOT NULL,
+  `nombre` varchar(50) DEFAULT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Volcado de datos para la tabla `tb_rol`
+--
+
+INSERT INTO `tb_rol` (`id_rol`, `nombre`) VALUES
+(1, 'Admin'),
+(2, 'Soporte'),
+(3, 'Soporte'),
+(4, 'Soporte');
+
+-- --------------------------------------------------------
+
+--
+-- Estructura de tabla para la tabla `tb_sedeproducto`
+--
+
+DROP TABLE IF EXISTS `tb_sedeproducto`;
+CREATE TABLE `tb_sedeproducto` (
+  `id_sedeproducto` int(11) NOT NULL,
+  `id_sede` int(11) NOT NULL,
+  `id_producto` int(11) NOT NULL,
+  `stock_disponible` int(11) DEFAULT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Volcado de datos para la tabla `tb_sedeproducto`
+--
+
+INSERT INTO `tb_sedeproducto` (`id_sedeproducto`, `id_sede`, `id_producto`, `stock_disponible`) VALUES
+(1, 1, 5, 100),
+(2, 1, 2, 100),
+(3, 1, 6, 100),
+(4, 2, 3, 100),
+(6, 2, 2, 90);
+
+-- --------------------------------------------------------
+
+--
+-- Estructura de tabla para la tabla `tb_sedes`
+--
+
+DROP TABLE IF EXISTS `tb_sedes`;
+CREATE TABLE `tb_sedes` (
+  `id_sede` int(11) NOT NULL,
+  `nombre` varchar(100) DEFAULT NULL,
+  `direccion` varchar(255) DEFAULT NULL,
+  `ciudad` varchar(100) DEFAULT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Volcado de datos para la tabla `tb_sedes`
+--
+
+INSERT INTO `tb_sedes` (`id_sede`, `nombre`, `direccion`, `ciudad`) VALUES
+(1, 'lima', 'lima', 'independencia'),
+(2, 'arequipa', 'arequipa', 'nose');
+
+-- --------------------------------------------------------
+
+--
+-- Estructura de tabla para la tabla `tb_usuario`
+--
+
+DROP TABLE IF EXISTS `tb_usuario`;
+CREATE TABLE `tb_usuario` (
+  `id_usuario` int(11) NOT NULL,
+  `nombre` varchar(50) DEFAULT NULL,
+  `apellido` varchar(50) DEFAULT NULL,
+  `email` varchar(50) DEFAULT NULL,
+  `celular` int(11) DEFAULT NULL,
+  `contraseña` varchar(100) DEFAULT NULL,
+  `fecha_registro` datetime DEFAULT NULL,
+  `id_usuario_rol` int(11) DEFAULT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+-- --------------------------------------------------------
+
+--
+-- Estructura de tabla para la tabla `tb_venta`
+--
+
+DROP TABLE IF EXISTS `tb_venta`;
+CREATE TABLE `tb_venta` (
+  `id_venta` int(11) NOT NULL,
+  `id_venta_usuario` int(11) DEFAULT NULL,
+  `id_venta_cliente` int(11) DEFAULT NULL,
+  `cantidad` int(11) DEFAULT NULL,
+  `fecha_venta` datetime DEFAULT NULL,
+  `id_metodopago_venta` int(11) DEFAULT NULL,
+  `total` float DEFAULT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Índices para tablas volcadas
+--
+
+--
+-- Indices de la tabla `tb_categoria`
+--
+ALTER TABLE `tb_categoria`
+  ADD PRIMARY KEY (`id_categoria`);
+
+--
+-- Indices de la tabla `tb_cliente`
+--
+ALTER TABLE `tb_cliente`
+  ADD PRIMARY KEY (`id_cliente`);
+
+--
+-- Indices de la tabla `tb_detalle_venta`
+--
+ALTER TABLE `tb_detalle_venta`
+  ADD PRIMARY KEY (`id_detalle_venta`),
+  ADD KEY `id_venta` (`id_venta`),
+  ADD KEY `id_producto` (`id_producto`);
+
+--
+-- Indices de la tabla `tb_metodo_pago`
+--
+ALTER TABLE `tb_metodo_pago`
+  ADD PRIMARY KEY (`id_metodopago`);
+
+--
+-- Indices de la tabla `tb_producto`
+--
+ALTER TABLE `tb_producto`
+  ADD PRIMARY KEY (`id_producto`),
+  ADD KEY `id_categoria_producto` (`id_categoria_producto`);
+
+--
+-- Indices de la tabla `tb_rol`
+--
+ALTER TABLE `tb_rol`
+  ADD PRIMARY KEY (`id_rol`);
+
+--
+-- Indices de la tabla `tb_sedeproducto`
+--
+ALTER TABLE `tb_sedeproducto`
+  ADD PRIMARY KEY (`id_sedeproducto`),
+  ADD UNIQUE KEY `unique_sede_producto` (`id_sede`,`id_producto`),
+  ADD KEY `id_producto` (`id_producto`);
+
+--
+-- Indices de la tabla `tb_sedes`
+--
+ALTER TABLE `tb_sedes`
+  ADD PRIMARY KEY (`id_sede`);
+
+--
+-- Indices de la tabla `tb_usuario`
+--
+ALTER TABLE `tb_usuario`
+  ADD PRIMARY KEY (`id_usuario`),
+  ADD KEY `id_usuario_rol` (`id_usuario_rol`);
+
+--
+-- Indices de la tabla `tb_venta`
+--
+ALTER TABLE `tb_venta`
+  ADD PRIMARY KEY (`id_venta`),
+  ADD KEY `id_venta_cliente` (`id_venta_cliente`),
+  ADD KEY `id_metodopago_venta` (`id_metodopago_venta`),
+  ADD KEY `id_venta_usuario` (`id_venta_usuario`);
+
+--
+-- AUTO_INCREMENT de las tablas volcadas
+--
+
+--
+-- AUTO_INCREMENT de la tabla `tb_categoria`
+--
+ALTER TABLE `tb_categoria`
+  MODIFY `id_categoria` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=7;
+
+--
+-- AUTO_INCREMENT de la tabla `tb_cliente`
+--
+ALTER TABLE `tb_cliente`
+  MODIFY `id_cliente` int(11) NOT NULL AUTO_INCREMENT;
+
+--
+-- AUTO_INCREMENT de la tabla `tb_detalle_venta`
+--
+ALTER TABLE `tb_detalle_venta`
+  MODIFY `id_detalle_venta` int(11) NOT NULL AUTO_INCREMENT;
+
+--
+-- AUTO_INCREMENT de la tabla `tb_metodo_pago`
+--
+ALTER TABLE `tb_metodo_pago`
+  MODIFY `id_metodopago` int(11) NOT NULL AUTO_INCREMENT;
+
+--
+-- AUTO_INCREMENT de la tabla `tb_producto`
+--
+ALTER TABLE `tb_producto`
+  MODIFY `id_producto` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=7;
+
+--
+-- AUTO_INCREMENT de la tabla `tb_rol`
+--
+ALTER TABLE `tb_rol`
+  MODIFY `id_rol` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=5;
+
+--
+-- AUTO_INCREMENT de la tabla `tb_sedeproducto`
+--
+ALTER TABLE `tb_sedeproducto`
+  MODIFY `id_sedeproducto` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=8;
+
+--
+-- AUTO_INCREMENT de la tabla `tb_sedes`
+--
+ALTER TABLE `tb_sedes`
+  MODIFY `id_sede` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
+
+--
+-- AUTO_INCREMENT de la tabla `tb_usuario`
+--
+ALTER TABLE `tb_usuario`
+  MODIFY `id_usuario` int(11) NOT NULL AUTO_INCREMENT;
+
+--
+-- AUTO_INCREMENT de la tabla `tb_venta`
+--
+ALTER TABLE `tb_venta`
+  MODIFY `id_venta` int(11) NOT NULL AUTO_INCREMENT;
+
+--
+-- Restricciones para tablas volcadas
+--
+
+--
+-- Filtros para la tabla `tb_detalle_venta`
+--
+ALTER TABLE `tb_detalle_venta`
+  ADD CONSTRAINT `tb_detalle_venta_ibfk_1` FOREIGN KEY (`id_venta`) REFERENCES `tb_venta` (`id_venta`) ON DELETE CASCADE,
+  ADD CONSTRAINT `tb_detalle_venta_ibfk_2` FOREIGN KEY (`id_producto`) REFERENCES `tb_producto` (`id_producto`) ON DELETE CASCADE;
+
+--
+-- Filtros para la tabla `tb_producto`
+--
+ALTER TABLE `tb_producto`
+  ADD CONSTRAINT `tb_producto_ibfk_1` FOREIGN KEY (`id_categoria_producto`) REFERENCES `tb_categoria` (`id_categoria`) ON DELETE CASCADE;
+
+--
+-- Filtros para la tabla `tb_sedeproducto`
+--
+ALTER TABLE `tb_sedeproducto`
+  ADD CONSTRAINT `tb_sedeproducto_ibfk_1` FOREIGN KEY (`id_sede`) REFERENCES `tb_sedes` (`id_sede`),
+  ADD CONSTRAINT `tb_sedeproducto_ibfk_2` FOREIGN KEY (`id_producto`) REFERENCES `tb_producto` (`id_producto`) ON DELETE CASCADE;
+
+--
+-- Filtros para la tabla `tb_usuario`
+--
+ALTER TABLE `tb_usuario`
+  ADD CONSTRAINT `tb_usuario_ibfk_1` FOREIGN KEY (`id_usuario_rol`) REFERENCES `tb_rol` (`id_rol`) ON DELETE CASCADE;
+
+--
+-- Filtros para la tabla `tb_venta`
+--
+ALTER TABLE `tb_venta`
+  ADD CONSTRAINT `tb_venta_ibfk_1` FOREIGN KEY (`id_venta_cliente`) REFERENCES `tb_cliente` (`id_cliente`) ON DELETE CASCADE,
+  ADD CONSTRAINT `tb_venta_ibfk_2` FOREIGN KEY (`id_metodopago_venta`) REFERENCES `tb_metodo_pago` (`id_metodopago`) ON DELETE CASCADE,
+  ADD CONSTRAINT `tb_venta_ibfk_3` FOREIGN KEY (`id_venta_usuario`) REFERENCES `tb_usuario` (`id_usuario`) ON DELETE CASCADE;
+COMMIT;
+
+/*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
+/*!40101 SET CHARACTER_SET_RESULTS=@OLD_CHARACTER_SET_RESULTS */;
+/*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;

@@ -19,15 +19,19 @@ if (!isset($url[0])) {
 
 switch ($url[0]) {
     case 'roles':
-        require __DIR__ . '/Routes/roles.php';
+        require __DIR__ . '/Routes/rolesRoutes.php';
+        break;
+
+    case 'categorias':
+        require __DIR__ . '/Routes/categoriasRoutes.php';
         break;
 
     case 'usuarios':
-        require __DIR__ . '/Routes/usuarios.php';
+        require __DIR__ . '/Routes/usuariosRoutes.php';
         break;
 
     case 'productos':
-        require __DIR__ . '/Routes/productos.php';
+        require __DIR__ . '/Routes/productosRoutes.php';
         break;
 
     default:
