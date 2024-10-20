@@ -1,10 +1,12 @@
 <?php
 
-namespace app\Data;
+namespace app\Data\Categoria;
 
 use PDO;
+use app\Data\BaseData;
 use app\Interfaces\CategoriaInterface;
 use app\Models\Categoria;
+
 
 class CategoriaRepository extends BaseData implements CategoriaInterface
 {
@@ -12,69 +14,49 @@ class CategoriaRepository extends BaseData implements CategoriaInterface
 
     public function find(array $filters): array
     {
-        $sql = "SELECT * FROM " . self::TABLE;
-        $conditions = [];
-        $params = [];
+        $query = "CALL sp_listar_categoria(?, ?, ?, ?)";
+        $stmt = $this->pdo->prepare($query);
 
-        if (!empty($filters)) {
-            foreach ($filters as $key => $value) {
-                if (!empty($value)) {
-                    if ($key === 'search') {
-                        $conditions[] = "nombre LIKE :search";
-                        $params[":search"] = '%' . $value . '%';
-                    } else {
-                        $conditions[] = "$key = :$key";
-                        $params[":$key"] = $value;
-                    }
-                }
-            }
+        $id = $filters['id_categoria'] ?? null;
+        $nombre = $filters['nombre'] ?? null;
+        $descripcion = $filters['descripcion'] ?? null;
 
-            if (!empty($conditions)) {
-                $sql .= " WHERE " . implode(' AND ', $conditions);
-            }
-        }
+        $stmt->bindParam(1, $id, PDO::PARAM_INT);
+        $stmt->bindParam(2, $nombre, PDO::PARAM_STR);
+        $stmt->bindParam(3, $descripcion, PDO::PARAM_STR);
 
-        $stmt = $this->pdo->prepare($sql);
-        $stmt->execute($params);
-
-        $categories = [];
-        foreach ($stmt->fetchAll(PDO::FETCH_OBJ) as $rol) {
-            $categories[] = new Categoria($rol->id_categoria, $rol->nombre, $rol->descripcion);
-        }
-
-        return $categories;
+        $stmt->execute();
+        
+        return $stmt->fetchAll(PDO::FETCH_ASSOC);
     }
-    public function create(Categoria $categoria): bool
-    {
-        $sql = "INSERT INTO " . self::TABLE . " (nombre, descripcion) VALUES (:nombre, :descripcion)";
-        $stmt = $this->pdo->prepare($sql);
 
+    public function save(Categoria $categoria): bool
+    {
+        $query = "CALL sp_guardar_categoria(?, ?, ?)";
+        $stmt = $this->pdo->prepare($query);
+
+        $id = $categoria->getId();
         $nombre = $categoria->getNombre();
         $descripcion = $categoria->getDescripcion();
-        $stmt->bindParam(':nombre', $nombre, PDO::PARAM_STR);
-        $stmt->bindParam(':descripcion', $descripcion, PDO::PARAM_STR);
+        $stmt->bindParam(1, $id, PDO::PARAM_INT);
+        $stmt->bindParam(2, $nombre, PDO::PARAM_STR);
+        $stmt->bindParam(3, $descripcion, PDO::PARAM_STR);
         return $stmt->execute();
     }
-    public function update(Categoria $rol): void
+
+    public function delete(int $id): bool
     {
-        $sql = "UPDATE " . self::TABLE . " SET nombre = :nombre, descripcion = :descripcion WHERE id_categoria = :id";
+        $sql = "DELETE FROM " . self::TABLE . " WHERE id_categoria = :id_categoria";
         $stmt = $this->pdo->prepare($sql);
-        $stmt->bindParam(':nombre', $rol->getNombre(), PDO::PARAM_STR);
-        $stmt->bindParam(':description', $rol->getDescripcion(), PDO::PARAM_STR);
-        $stmt->execute();
-    }
-    public function deleteById(int $id): bool
-    {
-        $sql = "DELETE FROM ". self::TABLE ." WHERE id_rol = :id";
-        $stmt = $this->pdo->prepare($sql);
-        $stmt->bindParam(':id', $id, PDO::PARAM_INT);
+        $stmt->bindParam(':id_categoria', $id, PDO::PARAM_INT);
         return $stmt->execute();
     }
+
     public function exists(int $id): bool
     {
-        $sql = "SELECT COUNT(*) AS count FROM " . self::TABLE . " WHERE id_categoria = :id";
+        $sql = "SELECT COUNT(*) AS count FROM " . self::TABLE . " WHERE id_categoria = :id_categoria";
         $stmt = $this->pdo->prepare($sql);
-        $stmt->bindParam(':id', $id, PDO::PARAM_INT);
+        $stmt->bindParam(':id_categoria', $id, PDO::PARAM_INT);
         $stmt->execute();
         $row = $stmt->fetch(PDO::FETCH_OBJ);
         return $row->count > 0;

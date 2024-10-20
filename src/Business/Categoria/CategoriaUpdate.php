@@ -6,6 +6,7 @@ use app\Interfaces\ValidatorInterface;
 use app\Interfaces\CategoriaInterface;
 use app\Exceptions\ValidationException;
 use app\exceptions\DataException;
+use app\Models\Categoria;
 
 class CategoriaUpdate
 {
@@ -32,10 +33,12 @@ class CategoriaUpdate
             throw new DataException('Categoria con id '.$id.' no encontrado');
         }
 
-        $categoria = $this->categoria->find(['id_categoria' => $id]);
+        $categoria = new Categoria(
+            $id,
+            $data['nombre'],
+            $data['descripcion']
+        );
 
-        $this->categoria->update($categoria[0]);
-
-        return "Categoria con id ". $categoria[0]->getId() ." actualizado con éxito";
+        return $this->categoria->save($categoria);
     }
 }

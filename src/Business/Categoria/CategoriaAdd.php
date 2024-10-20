@@ -26,6 +26,6 @@ class CategoriaAdd
 
         $categoria = new Categoria(0, $data['nombre'], $data['descripcion']);
 
-        $this->categoria->create($categoria);
+        $this->categoria->save($categoria);
     }
 }

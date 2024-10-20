@@ -26,6 +26,7 @@ switch ($url[0]) {
         require __DIR__ . '/Routes/categoriasRoutes.php';
         break;
 
+    case 'login':
     case 'usuarios':
         require __DIR__ . '/Routes/usuariosRoutes.php';
         break;

@@ -6,6 +6,7 @@ use app\Interfaces\ValidatorInterface;
 use app\Interfaces\RolInterface;
 use app\Exceptions\ValidationException;
 use app\exceptions\DataException;
+use app\Models\Rol;
 
 class RolUpdate
 {
@@ -18,7 +19,7 @@ class RolUpdate
         $this->validator = $validator;
     }
 
-    public function updateById(int $id = null, array $data = []): string
+    public function update($id, $data)
     {
         if (!$this->validator->validateId($id)) {
             throw new ValidationException($this->validator->getError());
@@ -32,10 +33,8 @@ class RolUpdate
             throw new DataException('Rol con id '.$id.' no encontrado');
         }
 
-        $rol = $this->rol->find(['id_rol' => $id]);
+        $rol = new Rol($id, $data['nombre']);
 
-        $this->rol->update($rol[0]);
-
-        return "Rol con id ". $rol[0]->getId() ." actualizado con éxito";
+        return $this->rol->save($rol);
     }
 }

@@ -15,12 +15,6 @@ class RolValidator implements ValidatorInterface
 
     public function validateFind(array $filters): bool
     {
-        
-        if (isset($filters['search']) && empty($filters['search'])) {
-            $this->error = 'El parámetro search no puede estar vacío';
-            return false;
-        }
-
         if (isset($filters['id_rol']) && !is_int($filters['id_rol'])) {
             $this->error = 'El ID debe ser un número entero';
             return false;

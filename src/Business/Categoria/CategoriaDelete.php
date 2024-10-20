@@ -24,6 +24,6 @@ class CategoriaDelete
             throw new DataException('Categoria con id '.$id.' no encontrado');
         }
 
-        return $this->categoria->deleteById($id);
+        return $this->categoria->delete($id);
     }
 }

@@ -26,6 +26,6 @@ class RolAdd
 
         $rol = new Rol(0, $data['nombre']);
 
-        return $this->rol->create($rol);
+        return $this->rol->save($rol);
     }
 }

@@ -2,12 +2,12 @@
 
 namespace app\Interfaces;
 
-use app\Models\Categoria;
+use app\Models\Usuario;
 
-interface CategoriaInterface
+interface UsuarioInterface
 {
     public function find(array $filters): array;
-    public function save(Categoria $rol): bool;
+    public function save(Usuario $producto): bool;
     public function delete(int $id): bool;
     public function exists(int $id): bool;
 }

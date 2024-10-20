@@ -40,7 +40,7 @@ class RolController
                 return json_encode(['message' => 'Rol creado exitosamente', 'data' => $result]);
 
             case 'update':
-                $result =$this->update->updateById($data['id'], $data);
+                $result =$this->update->update($data['id'], $data);
                 return json_encode(['message' => $result]);
 
             case 'delete':
