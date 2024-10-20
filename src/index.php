@@ -1,8 +1,10 @@
 <?php
 
 require __DIR__ . '/../vendor/autoload.php';
-require __DIR__ . '/../config/database.php';
-
+define('DB_HOST', 'localhost');
+define('DB_NAME', 'db_dollartoy');
+define('DB_USER', 'root');
+define('DB_PASS', '');
 $baseUri = '/ApiRestDollarToy/api';
 $uri = parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH);
 
