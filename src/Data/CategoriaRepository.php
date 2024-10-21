@@ -1,6 +1,6 @@
 <?php
 
-namespace app\Data\Categoria;
+namespace app\Data;
 
 use PDO;
 use app\Data\BaseData;
@@ -14,16 +14,14 @@ class CategoriaRepository extends BaseData implements CategoriaInterface
 
     public function find(array $filters): array
     {
-        $query = "CALL sp_listar_categoria(?, ?, ?, ?)";
+        $query = "CALL sp_listar_categoria(?, ?)";
         $stmt = $this->pdo->prepare($query);
 
         $id = $filters['id_categoria'] ?? null;
         $nombre = $filters['nombre'] ?? null;
-        $descripcion = $filters['descripcion'] ?? null;
 
         $stmt->bindParam(1, $id, PDO::PARAM_INT);
         $stmt->bindParam(2, $nombre, PDO::PARAM_STR);
-        $stmt->bindParam(3, $descripcion, PDO::PARAM_STR);
 
         $stmt->execute();
         
