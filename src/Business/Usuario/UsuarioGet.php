@@ -4,6 +4,7 @@ namespace app\Business\Usuario;
 
 use app\exceptions\DataException;
 use app\exceptions\ValidationException;
+use app\Interfaces\RolInterface;
 use app\Interfaces\UsuarioInterface;
 use app\Models\Usuario;
 use app\Validators\UsuarioValidator;
@@ -12,11 +13,13 @@ class UsuarioGet
 {
     private UsuarioInterface $usuario;
     private UsuarioValidator $validator;
+    private RolInterface $rol;
 
-    public function __construct(UsuarioInterface $usuario, UsuarioValidator $validator)
+    public function __construct(UsuarioInterface $usuario, UsuarioValidator $validator, RolInterface $rol)
     {
         $this->usuario = $usuario;
         $this->validator = $validator;
+        $this->rol = $rol;
     }
 
     public function find(array $filters): array
@@ -43,9 +46,11 @@ class UsuarioGet
         return $usuarios;
     }
 
-    public function validateLogin(string $email, string $password): bool
+    public function login(string $email, string $password): array
     {
         $usuario = $this->find(['email' => $email]);
+
+        $rol = $this->rol->find(['id_rol' => $usuario[0]->getIdUsuarioRol()]);
 
         if (empty($usuario)) {
             throw new ValidationException('Usuario no encontrado');
@@ -54,6 +59,6 @@ class UsuarioGet
         if (!password_verify($password, $usuario[0]->getpassword())) {
             throw new ValidationException("Contraseña incorrecta, password es : " . $usuario[0]->getpassword() . " contraseña que se ha enviado: " . $password);
         }
-        return true;
+        return ['usuario' => $usuario[0], 'rol' => $rol[0]];
     }
 }

@@ -76,29 +76,37 @@ class UsuarioController
             return json_encode(['error' => 'Email o contraseña no proporcionados']);
         }
 
-        $this->get->validateLogin($email, $password);
-        $usuario = $this->get->find(['email' => $email]);
+        $login = $this->get->login($email, $password);
+        $usuarios = $this->get->find(['email' => $email]);
         // var_dump($usuario);
         $token = $this->jwtAuth->generateToken([
-            'id' => $usuario[0]->getId(),
-            'nombre' => $usuario[0]->getNombre(),
-            'apellido' => $usuario[0]->getApellido(),
-            'email' => $usuario[0]->getEmail(),
+            'id' => $usuarios[0]->getId(),
+            'nombre' => $usuarios[0]->getNombre(),
+            'apellido' => $usuarios[0]->getApellido(),
+            'email' => $usuarios[0]->getEmail(),
         ]);
 
-        return json_encode(['token' => $token]);
+        // obtener el primer usuario con array
+        $usuario = [];
+        $usuario['id'] = $usuarios[0]->getId();
+        $usuario['nombre'] = $usuarios[0]->getNombre();
+        $usuario['apellido'] = $usuarios[0]->getApellido();
+        $usuario['email'] = $usuarios[0]->getEmail();
+        $usuario['rol'] = $login['rol']['nombre'];
+
+        return json_encode(['token' => $token, 'usuario' => $usuario ]);
     }
 
     public static function createInstance(): self
     {
         $repository = new UsuarioRepository();
-        $rol = new RolRepository();
         $validator = new UsuarioValidator();
+        $rol = new RolRepository();
         $secretKey = 'esta-es-una-clave-super-secreta';
 
         return new self(
             new UsuarioAdd($repository, $rol, $validator),
-            new UsuarioGet($repository, $validator),
+            new UsuarioGet($repository, $validator, $rol),
             new UsuarioUpdate($repository, $rol, $validator),
             new UsuarioDelete($repository),
             new JwtAuth($secretKey)
