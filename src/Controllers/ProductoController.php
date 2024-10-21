@@ -9,6 +9,8 @@ use app\Business\Producto\ProductoDelete;
 use app\Data\CategoriaRepository;
 use app\Data\ProductoRepository;
 use app\Data\SedeRepository;
+use app\Mail\Mail;
+use app\Mail\Mailer;
 use app\Validators\ProductoValidator;
 
 class ProductoController
@@ -17,17 +19,20 @@ class ProductoController
     private ProductoGet $get;
     private ProductoUpdate $update;
     private ProductoDelete $delete;
+    private Mailer $mailer;
 
     public function __construct(
         ProductoAdd $create,
         ProductoGet $get,
         ProductoUpdate $update,
-        ProductoDelete $delete
+        ProductoDelete $delete,
+        Mailer $mailer
     ) {
         $this->create = $create;
         $this->get = $get;
         $this->update = $update;
         $this->delete = $delete;
+        $this->mailer = $mailer;
     }
 
     public function handleRequest(string $method, array $data): string
@@ -39,10 +44,11 @@ class ProductoController
 
             case 'create':
                 $result = $this->create->add($data);
+                $this->sendEmailNotification($data);
                 return json_encode(['message' => 'Producto creado exitosamente', 'data' => $result]);
 
             case 'update':
-                $result =$this->update->updateById($data['id'], $data);
+                $result = $this->update->updateById($data['id'], $data);
                 return json_encode(['message' => $result]);
 
             case 'delete':
@@ -52,6 +58,15 @@ class ProductoController
             default:
                 return json_encode(['error' => 'Método no soportado']);
         }
+    }
+
+    private function sendEmailNotification(array $data): void
+    {
+        $to = '1476324@senati.pe';
+        $subject = 'Nuevo producto creado';
+        $body = 'Se ha creado un nuevo producto: ' . $data['nombre'];
+
+        $this->mailer->sendEmail($to, $subject, $body);
     }
 
     public static function createInstance(): self
@@ -65,7 +80,8 @@ class ProductoController
             new ProductoAdd($repository, $validator, $categoria, $sede),
             new ProductoGet($repository, $validator),
             new ProductoUpdate($repository, $validator, $categoria, $sede),
-            new ProductoDelete($repository)
+            new ProductoDelete($repository),
+            new Mailer()
         );
     }
 }

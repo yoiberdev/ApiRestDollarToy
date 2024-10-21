@@ -1,7 +1,7 @@
 <?php
 
 require_once __DIR__ . '/../vendor/autoload.php';
-// require_once __DIR__ . '/config/database.php';
+
 define('DB_HOST', 'dbdollartoy.cnqokie0q9sv.us-east-1.rds.amazonaws.com');
 define('DB_NAME', 'dbdollartoy');
 define('DB_USER', 'admin');
