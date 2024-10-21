@@ -1,0 +1,19 @@
+[INFO][2024-10-22 00:11:34]: RolController::handleRequest GET
+[INFO][2024-10-22 00:11:34]: RolController::handleRequest find[]
+[INFO][2024-10-22 00:12:24]: RolController::handleRequest GET
+[INFO][2024-10-22 00:12:24]: RolController::handleRequest find{"nombre":"sdmfkmsp"}
+[ERROR][2024-10-22 00:12:24]: DataException: No se encontró ningún rol con el nombre "sdmfkmsp"
+[INFO][2024-10-22 00:12:33]: RolController::handleRequest POST
+[INFO][2024-10-22 00:12:33]: RolController::handleRequest create null
+[ERROR][2024-10-22 00:12:33]: TypeError: app\Controllers\RolController::handleRequest(): Argument #2 ($data) must be of type array, null given, called in C:\xampp\htdocs\ApiRestDollarToy\src\Routes\rolesRoutes.php on line 50
+[INFO][2024-10-22 00:13:16]: RolController::handleRequest POST
+[INFO][2024-10-22 00:13:16]: RolController::handleRequest create {"nombre":"Vendedor"}
+[INFO][2024-10-22 00:13:21]: RolController::handleRequest POST
+[INFO][2024-10-22 00:13:21]: RolController::handleRequest create null
+[ERROR][2024-10-22 00:13:21]: TypeError: app\Controllers\RolController::handleRequest(): Argument #2 ($data) must be of type array, null given, called in C:\xampp\htdocs\ApiRestDollarToy\src\Routes\rolesRoutes.php on line 51
+[INFO][2024-10-22 00:13:40]: RolController::handleRequest POST
+[INFO][2024-10-22 00:13:40]: RolController::handleRequest create null
+[ERROR][2024-10-22 00:13:40]: TypeError: app\Controllers\RolController::handleRequest(): Argument #2 ($data) must be of type array, null given, called in C:\xampp\htdocs\ApiRestDollarToy\src\Routes\rolesRoutes.php on line 51
+[INFO][2024-10-22 00:14:01]: RolController::handleRequest POST
+[INFO][2024-10-22 00:14:01]: RolController::handleRequest create null
+[ERROR][2024-10-22 00:14:01]: TypeError: app\Controllers\RolController::handleRequest(): Argument #2 ($data) must be of type array, null given, called in C:\xampp\htdocs\ApiRestDollarToy\src\Routes\rolesRoutes.php on line 51

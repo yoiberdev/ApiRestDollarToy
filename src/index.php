@@ -1,10 +1,12 @@
 <?php
 
 require_once __DIR__ . '/../vendor/autoload.php';
+
+use app\Middleware\CorsMiddleware;
+
+CorsMiddleware::handle();
+
 header('Content-Type: application/json');
-header("Access-Control-Allow-Origin: *");
-header("Access-Control-Allow-Methods: GET, POST, PUT, DELETE, OPTIONS");
-header("Access-Control-Allow-Headers: Content-Type, Authorization");
 
 define('DB_HOST', 'dbdollartoy.cnqokie0q9sv.us-east-1.rds.amazonaws.com');
 define('DB_NAME', 'dbdollartoy');

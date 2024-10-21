@@ -1,0 +1,2 @@
+[INFO][2024-10-22 00:18:49]: CategoriaController::handleRequest GET
+[INFO][2024-10-22 00:18:49]: CategoriaController::handleRequest find[]

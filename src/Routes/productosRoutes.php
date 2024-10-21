@@ -3,15 +3,23 @@
 use app\Controllers\ProductoController;
 use app\Exceptions\ValidationException;
 use app\Exceptions\DataException;
+use app\Helpers\FileLogHandler;
+use app\Helpers\Log;
 
 try {
 
     $controller = ProductoController::createInstance();
 
+    $logFilePath = 'logs/' . date('Y-m-d') . '-producto-log.txt';
+    $logHandler = new FileLogHandler($logFilePath);
+    $logger = new Log($logHandler);
+
     $method = $_SERVER['REQUEST_METHOD'];
     $data = [];
 
     $id = isset($url[1]) ? (int)$url[1] : null;
+
+    $logger->writeLine('INFO', 'ProductoController::handleRequest ' . $method);
 
     switch ($method) {
         case 'GET':
@@ -23,19 +31,23 @@ try {
                 'precio_min' => isset($_GET['precio_min']) ? (float)$_GET['precio_min'] : null,
                 'precio_max' => isset($_GET['precio_max']) ? (float)$_GET['precio_max'] : null
             ];
-
+            
+            $logger->writeLine('INFO', 'ProductoController::handleRequest find' . json_encode($filters));
             $productos = $controller->handleRequest('find', $filters);
             echo $productos;
             break;
 
         case 'POST':
             $body = json_decode(file_get_contents('php://input'), true);
+            $logger->writeLine('INFO', 'ProductoController::handleRequest create ' . json_encode($body));
+
             $result = $controller->handleRequest('create', $body);
             echo $result;
             break;
 
         case 'PUT':
             $body = json_decode(file_get_contents('php://input'), true);
+            $logger->writeLine('INFO', 'ProductoController::handleRequest update ' . json_encode($body));
 
             $body['id'] = $id ?? null;
 
@@ -44,28 +56,35 @@ try {
 
         case 'DELETE':
             $data['id'] = $id ?? null;
+            $logger->writeLine('INFO', 'ProductoController::handleRequest delete ID ' . $data['id']);
 
             echo $controller->handleRequest('delete', $data);
             break;
 
         default:
+            $logger->writeLine('ERROR', 'Método no soportado: ' . $method);
             http_response_code(405);
             echo json_encode(['error' => 'Método no soportado']);
             break;
     }
 } catch (ValidationException $e) {
+    $logger->writeLine('ERROR', 'ValidationException: ' . $e->getMessage());
     http_response_code(400);
     echo json_encode(['error' => $e->getMessage()]);
 } catch (DataException $e) {
+    $logger->writeLine('ERROR', 'DataException: ' . $e->getMessage());
     http_response_code(404);
     echo json_encode(['error' => $e->getMessage()]);
 } catch (\PDOException $e) {
+    $logger->writeLine('ERROR', 'PDOException: ' . $e->getMessage());
     http_response_code(500);
     echo json_encode(['error' => $e->getMessage()]);
 } catch (\Exception $e) {
+    $logger->writeLine('ERROR', 'Exception: ' . $e->getMessage());
     http_response_code(500);
     echo json_encode(['error' => $e->getMessage()]);
 } catch (\TypeError $e) {
+    $logger->writeLine('ERROR', 'TypeError: ' . $e->getMessage());
     http_response_code(400);
     echo json_encode(['error' => $e->getMessage()]);
 }

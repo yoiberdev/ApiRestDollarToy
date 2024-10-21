@@ -17,7 +17,7 @@ class JwtAuth
     public function generateToken(array $data): string
     {
         $payload = [
-            'iss' => 'https://api-rest-dollar-toy.vercel.app',
+            'iss' => 'http://localhost/ApiRestDollarToy/api',
             'iat' => time(),
             'exp' => time() + (60 * 60),
             'data' => $data
