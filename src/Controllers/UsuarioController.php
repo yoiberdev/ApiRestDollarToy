@@ -78,12 +78,12 @@ class UsuarioController
 
         $this->get->validateLogin($email, $password);
         $usuario = $this->get->find(['email' => $email]);
-
+        // var_dump($usuario);
         $token = $this->jwtAuth->generateToken([
             'id' => $usuario[0]->getId(),
             'nombre' => $usuario[0]->getNombre(),
+            'apellido' => $usuario[0]->getApellido(),
             'email' => $usuario[0]->getEmail(),
-            'id_rol' => $usuario[0]->getIdUsuarioRol()
         ]);
 
         return json_encode(['token' => $token]);
@@ -94,7 +94,7 @@ class UsuarioController
         $repository = new UsuarioRepository();
         $rol = new RolRepository();
         $validator = new UsuarioValidator();
-        $secretKey = getenv('JWT_SECRET_KEY');
+        $secretKey = 'esta-es-una-clave-super-secreta';
 
         return new self(
             new UsuarioAdd($repository, $rol, $validator),

@@ -17,7 +17,7 @@ class JwtAuth
     public function generateToken(array $data): string
     {
         $payload = [
-            'iss' => getenv('JWT_ISSUER') ?? '',
+            'iss' => 'http://localhost/ApiRestDollarToy/api',
             'iat' => time(),
             'exp' => time() + (60 * 60),
             'data' => $data
