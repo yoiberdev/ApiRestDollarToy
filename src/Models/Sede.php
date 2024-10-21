@@ -2,7 +2,7 @@
 
 namespace app\Models;
 
-class Sedes
+class Sede
 {
     private int $id;
     private string $nombre;

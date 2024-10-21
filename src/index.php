@@ -26,6 +26,11 @@ if (!isset($url[0])) {
 }
 
 switch ($url[0]) {
+    case 'login':
+    case 'usuarios':
+        require __DIR__ . '/Routes/usuariosRoutes.php';
+        break;
+
     case 'roles':
         require __DIR__ . '/Routes/rolesRoutes.php';
         break;
@@ -34,9 +39,8 @@ switch ($url[0]) {
         require __DIR__ . '/Routes/categoriasRoutes.php';
         break;
 
-    case 'login':
-    case 'usuarios':
-        require __DIR__ . '/Routes/usuariosRoutes.php';
+    case 'sedes':
+        require __DIR__ . '/Routes/sedesRoutes.php';
         break;
 
     case 'productos':

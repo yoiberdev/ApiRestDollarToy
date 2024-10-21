@@ -3,10 +3,10 @@
 namespace app\Data;
 
 use PDO;
-use app\Interfaces\SedesInterface;
-use app\Models\Sedes;
+use app\Interfaces\SedeInterface;
+use app\Models\Sede;
 
-class SedeRepository extends BaseData implements SedesInterface
+class SedeRepository extends BaseData implements SedeInterface
 {
     public function find(array $filters): array
     {
@@ -35,17 +35,25 @@ class SedeRepository extends BaseData implements SedesInterface
         $stmt = $this->pdo->prepare($sql);
         $stmt->execute($params);
 
-        $sedes = [];
-        foreach ($stmt->fetchAll(PDO::FETCH_OBJ) as $sede) {
-            $sedes[] = new Sedes($sede->id_sede, $sede->nombre, $sede->direccion, $sede->ciudad);
-        }
-
-        return $sedes;
+        return $stmt->fetchAll(PDO::FETCH_OBJ);
     }
 
-    public function save(Sedes $sede): bool
+    public function save(Sede $sede): bool
     {
-        return true;
+        $query = "CALL sp_guardar_sede(?, ?, ?, ?)";
+        $stmt = $this->pdo->prepare($query);
+
+        $id = $sede->getId();
+        $nombre = $sede->getNombre();
+        $direccion = $sede->getDireccion();
+        $ciudad = $sede->getCiudad();
+
+        $stmt->bindParam(1, $id, PDO::PARAM_INT);
+        $stmt->bindParam(2, $nombre, PDO::PARAM_STR);
+        $stmt->bindParam(3, $direccion, PDO::PARAM_STR);
+        $stmt->bindParam(4, $ciudad, PDO::PARAM_STR);
+
+        return $stmt->execute();
     }
 
     public function deleteById(int $id): bool

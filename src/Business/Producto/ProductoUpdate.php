@@ -7,7 +7,7 @@ use app\Interfaces\ValidatorInterface;
 use app\Interfaces\ProductoInterface;
 use app\Exceptions\ValidationException;
 use app\exceptions\DataException;
-use app\Interfaces\SedesInterface;
+use app\Interfaces\SedeInterface;
 use app\Models\SedeProducto;
 use app\Models\Producto;
 
@@ -16,9 +16,9 @@ class ProductoUpdate
     private ProductoInterface $producto;
     private ValidatorInterface $validator;
     private CategoriaInterface $categoria;
-    private SedesInterface $sede;
+    private SedeInterface $sede;
 
-    public function __construct(ProductoInterface $producto, ValidatorInterface $validator, CategoriaInterface $categoria, SedesInterface $sede)
+    public function __construct(ProductoInterface $producto, ValidatorInterface $validator, CategoriaInterface $categoria, SedeInterface $sede)
     {
         $this->producto = $producto;
         $this->validator = $validator;
