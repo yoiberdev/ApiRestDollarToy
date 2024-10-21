@@ -4,6 +4,7 @@ use app\Controllers\ProductoController;
 use app\Exceptions\ValidationException;
 use app\Exceptions\DataException;
 use app\Helpers\FileLogHandler;
+use app\Helpers\FileUploader;
 use app\Helpers\Log;
 
 try {
@@ -13,6 +14,9 @@ try {
     $logFilePath = 'logs/' . date('Y-m-d') . '-producto-log.txt';
     $logHandler = new FileLogHandler($logFilePath);
     $logger = new Log($logHandler);
+
+    $fileUploader = new FileUploader();
+    $destinationFolder = 'uploads/productos';
 
     $method = $_SERVER['REQUEST_METHOD'];
     $data = [];
@@ -31,14 +35,30 @@ try {
                 'precio_min' => isset($_GET['precio_min']) ? (float)$_GET['precio_min'] : null,
                 'precio_max' => isset($_GET['precio_max']) ? (float)$_GET['precio_max'] : null
             ];
-            
+
             $logger->writeLine('INFO', 'ProductoController::handleRequest find' . json_encode($filters));
             $productos = $controller->handleRequest('find', $filters);
             echo $productos;
             break;
 
         case 'POST':
-            $body = json_decode(file_get_contents('php://input'), true);
+            $body = [
+                'nombre' => $_POST['nombre'] ?? null,
+                'descripcion' => $_POST['descripcion'] ?? null,
+                'precio' => isset($_POST['precio']) ? (float)$_POST['precio'] : null,
+                'id_categoria_producto' => isset($_POST['id_categoria_producto']) ? (int)$_POST['id_categoria_producto'] : null,
+                'id_sede' => isset($_POST['id_sede']) ? (int)$_POST['id_sede'] : null,
+                'stock_disponible' => isset($_POST['stock_disponible']) ? (int)$_POST['stock_disponible'] : null,
+                'operacion' => $_POST['operacion'] ?? null,
+            ];
+
+            if (isset($_FILES['imagen'])) {
+                $filePath = $fileUploader->upload($_FILES['imagen'], $destinationFolder);
+                $body['imagen_url'] = $filePath;
+            } else {
+                $body['imagen_url'] = null;
+            }
+            
             $logger->writeLine('INFO', 'ProductoController::handleRequest create ' . json_encode($body));
 
             $result = $controller->handleRequest('create', $body);
@@ -46,7 +66,22 @@ try {
             break;
 
         case 'PUT':
-            $body = json_decode(file_get_contents('php://input'), true);
+            $body = [
+                'id' => isset($_POST['id']) ? (int)$_POST['id'] : null,
+                'nombre' => $_POST['nombre'] ?? null,
+                'descripcion' => $_POST['descripcion'] ?? null,
+                'precio' => isset($_POST['precio']) ? (float)$_POST['precio'] : null,
+                'id_categoria_producto' => isset($_POST['id_categoria_producto']) ? (int)$_POST['id_categoria_producto'] : null,
+                'id_sede' => isset($_POST['id_sede']) ? (int)$_POST['id_sede'] : null,
+                'stock_disponible' => isset($_POST['stock_disponible']) ? (int)$_POST['stock_disponible'] : null,
+                'operacion' => $_POST['operacion'] ?? null,
+            ];
+
+            if (isset($body['imagen'])) {
+                $filePath = $fileUploader->upload($body['imagen'], $destinationFolder);
+                $body['imagen_url'] = $filePath;
+            }
+
             $logger->writeLine('INFO', 'ProductoController::handleRequest update ' . json_encode($body));
 
             $body['id'] = $id ?? null;

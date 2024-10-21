@@ -48,6 +48,11 @@ class ProductoUpdate
             throw new DataException('Sede con id '.$data['id_sede'].' no encontrado');
         }
 
+        if (empty($data['imagen_url'])) {
+            $producto = $this->producto->find(['id_producto' => $data['id']]);
+            $data['imagen_url'] = $producto[0]->getImg();
+        }
+
         $producto = new Producto(
             $data['id'],
             $data['nombre'], 

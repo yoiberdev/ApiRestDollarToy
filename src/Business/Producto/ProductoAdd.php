@@ -28,6 +28,7 @@ class ProductoAdd
 
     public function add(array $data)
     {
+        var_dump($data);
         if (!$this->validator->validateAdd($data)) {
             throw new ValidationException($this->validator->getError());
         }
@@ -39,7 +40,6 @@ class ProductoAdd
         if (!$this->sede->exists($data['id_sede'])) {
             throw new DataException('Sede con id '.$data['id_sede'].' no encontrado');
         }
-
         $producto = new Producto(
             0, 
             $data['nombre'], 
