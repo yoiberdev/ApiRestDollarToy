@@ -12,7 +12,7 @@ class Mailer
     private string $password;
     private int $port;
 
-    public function __construct(string $host = 'smtp.gmail.com', string $username = 'yoiber696@gmail.com', string $password = 'mlmkfzjycvqyjkcm', int $port = 587)
+    public function __construct(string $host = 'smtp.gmail.com', string $username = 'yoiber696@gmail.com', string $password = '********', int $port = 587)
     {
         $this->host = $host;
         $this->username = $username;
