@@ -4,8 +4,6 @@ use app\Controllers\CategoriaController;
 use app\Exceptions\ValidationException;
 use app\Exceptions\DataException;
 
-header('Content-Type: application/json');
-
 try {
 
     $controller = CategoriaController::createInstance();

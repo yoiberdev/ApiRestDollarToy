@@ -4,8 +4,6 @@ use app\Controllers\RolController;
 use app\Exceptions\ValidationException;
 use app\Exceptions\DataException;
 
-header('Content-Type: application/json');
-
 try {
 
     $controller = RolController::createInstance();

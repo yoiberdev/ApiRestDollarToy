@@ -5,9 +5,6 @@ use app\Controllers\UsuarioController;
 use app\Exceptions\ValidationException;
 use app\Exceptions\DataException;
 use app\Middleware\JwtMiddleware;
-use Dotenv\Dotenv;
-
-header('Content-Type: application/json');
 
 $jwtAuth = new JwtAuth('esta-es-una-clave-super-secreta');
 $jwtMiddleware = new JwtMiddleware($jwtAuth);
