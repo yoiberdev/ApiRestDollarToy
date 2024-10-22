@@ -4,15 +4,12 @@ namespace app\Models;
 
 class SedeProducto
 {
-    private int $id_sede;
-    private int $id_producto;
-    private int $stock_disponible;
-
-    public function __construct(int $id_sede, int $id_producto, int $stock_disponible)
-    {
-        $this->id_sede = $id_sede;
-        $this->id_producto = $id_producto;
-        $this->stock_disponible = $stock_disponible;
+    public function __construct(
+        private int $id_sede,
+        private int $id_producto,
+        private int $stock_disponible
+    ) {
+        // Define las propiedades privadas y protegidas con los valores de la clase en el constructor
     }
 
     public function getId_sede()

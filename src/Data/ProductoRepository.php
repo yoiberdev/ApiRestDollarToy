@@ -4,9 +4,7 @@ namespace app\Data;
 
 use app\Interfaces\ProductoInterface;
 use PDO;
-use app\Interfaces\RolInterface;
 use app\Models\Producto;
-use app\Models\Categoria;
 use app\Models\SedeProducto;
 
 class ProductoRepository extends BaseData implements ProductoInterface

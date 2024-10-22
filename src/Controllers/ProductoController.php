@@ -15,25 +15,13 @@ use app\Validators\ProductoValidator;
 
 class ProductoController
 {
-    private ProductoAdd $create;
-    private ProductoGet $get;
-    private ProductoUpdate $update;
-    private ProductoDelete $delete;
-    private Mailer $mailer;
-
     public function __construct(
-        ProductoAdd $create,
-        ProductoGet $get,
-        ProductoUpdate $update,
-        ProductoDelete $delete,
-        Mailer $mailer
-    ) {
-        $this->create = $create;
-        $this->get = $get;
-        $this->update = $update;
-        $this->delete = $delete;
-        $this->mailer = $mailer;
-    }
+        private ProductoAdd $create,
+        private ProductoGet $get,
+        private ProductoUpdate $update,
+        private ProductoDelete $delete,
+        private Mailer $mailer
+    ) {}
 
     public function handleRequest(string $method, array $data): string
     {
