@@ -75,11 +75,12 @@ class ProductoController
         $validator = new ProductoValidator();
         $categoria = new CategoriaRepository();
         $sede = new SedeRepository();
+        $productoGet = new ProductoGet($repository, $validator);
 
         return new self(
             new ProductoAdd($repository, $validator, $categoria, $sede),
             new ProductoGet($repository, $validator),
-            new ProductoUpdate($repository, $validator, $categoria, $sede),
+            new ProductoUpdate($repository, $validator, $categoria, $productoGet, $sede),
             new ProductoDelete($repository),
             new Mailer()
         );

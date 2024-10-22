@@ -38,11 +38,20 @@ try {
 
             $logger->writeLine('INFO', 'ProductoController::handleRequest find' . json_encode($filters));
             $productos = $controller->handleRequest('find', $filters);
-            echo $productos;
+            $productoData = json_decode($productos, true);
+
+            //arramap para cambiar la url de la imagen de cada indice
+            $productoData = array_map(function ($producto) {
+                $producto['imagen_url'] = 'http://localhost/ApiRestDollarToy/api/images/' . basename($producto['imagen_url']);
+                return $producto;
+            }, $productoData);
+
+            echo json_encode($productoData);
             break;
 
         case 'POST':
             $body = [
+                'id' => $id ? $id : $_POST['id'] ?? null,
                 'nombre' => $_POST['nombre'] ?? null,
                 'descripcion' => $_POST['descripcion'] ?? null,
                 'precio' => isset($_POST['precio']) ? (float)$_POST['precio'] : null,
@@ -58,16 +67,21 @@ try {
             } else {
                 $body['imagen_url'] = null;
             }
-            
+
             $logger->writeLine('INFO', 'ProductoController::handleRequest create ' . json_encode($body));
 
-            $result = $controller->handleRequest('create', $body);
+            if ($id === null) {
+                $result = $controller->handleRequest('create', $body);
+            } else {
+                $result = $controller->handleRequest('update', $body);
+            }
+
             echo $result;
             break;
 
         case 'PUT':
             $body = [
-                'id' => isset($_POST['id']) ? (int)$_POST['id'] : null,
+                'id' => $id ? $id : $_POST['id'] ?? null,
                 'nombre' => $_POST['nombre'] ?? null,
                 'descripcion' => $_POST['descripcion'] ?? null,
                 'precio' => isset($_POST['precio']) ? (float)$_POST['precio'] : null,

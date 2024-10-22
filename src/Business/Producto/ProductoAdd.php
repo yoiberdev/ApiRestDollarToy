@@ -28,7 +28,7 @@ class ProductoAdd
 
     public function add(array $data)
     {
-        var_dump($data);
+        
         if (!$this->validator->validateAdd($data)) {
             throw new ValidationException($this->validator->getError());
         }

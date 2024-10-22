@@ -16,13 +16,15 @@ class ProductoUpdate
     private ProductoInterface $producto;
     private ValidatorInterface $validator;
     private CategoriaInterface $categoria;
+    private ProductoGet $productoGet;
     private SedeInterface $sede;
 
-    public function __construct(ProductoInterface $producto, ValidatorInterface $validator, CategoriaInterface $categoria, SedeInterface $sede)
+    public function __construct(ProductoInterface $producto, ValidatorInterface $validator, CategoriaInterface $categoria, ProductoGet $productoGet, SedeInterface $sede)
     {
         $this->producto = $producto;
         $this->validator = $validator;
         $this->categoria = $categoria;
+        $this->productoGet = $productoGet;
         $this->sede = $sede;
     }
 
@@ -49,8 +51,8 @@ class ProductoUpdate
         }
 
         if (empty($data['imagen_url'])) {
-            $producto = $this->producto->find(['id_producto' => $data['id']]);
-            $data['imagen_url'] = $producto[0]->getImg();
+            $producto = $this->productoGet->find(['id_producto' => $data['id']]);
+            $data['imagen_url'] = $producto[0]['imagen_url'];
         }
 
         $producto = new Producto(

@@ -16,4 +16,7 @@
 [ERROR][2024-10-22 00:13:40]: TypeError: app\Controllers\RolController::handleRequest(): Argument #2 ($data) must be of type array, null given, called in C:\xampp\htdocs\ApiRestDollarToy\src\Routes\rolesRoutes.php on line 51
 [INFO][2024-10-22 00:14:01]: RolController::handleRequest POST
 [INFO][2024-10-22 00:14:01]: RolController::handleRequest create null
-[ERROR][2024-10-22 00:14:01]: TypeError: app\Controllers\RolController::handleRequest(): Argument #2 ($data) must be of type array, null given, called in C:\xampp\htdocs\ApiRestDollarToy\src\Routes\rolesRoutes.php on line 51
+[ERROR][2024-10-22 00:14:01]: TypeError: app\Controllers\RolController::handleRequest(): Argument #2 ($data) must be of type array, null given, called in C:\xampp\htdocs\ApiRestDollarToy\src\Routes\rolesRoutes.php on line 51[INFO][2024-10-22 01:49:46]: RolController::handleRequest GET
+[INFO][2024-10-22 01:49:46]: RolController::handleRequest find[]
+[INFO][2024-10-22 01:51:38]: RolController::handleRequest GET
+[INFO][2024-10-22 01:51:38]: RolController::handleRequest find[]

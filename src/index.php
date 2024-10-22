@@ -48,7 +48,10 @@ switch ($url[0]) {
     case 'productos':
         require __DIR__ . '/Routes/productosRoutes.php';
         break;
-
+    case 'images':
+        require __DIR__ . '/Routes/imageRoutes.php';
+        break;
+        
     default:
         header('HTTP/1.1 404 Not Found');
         echo json_encode(['error' => 'Route not found']);
