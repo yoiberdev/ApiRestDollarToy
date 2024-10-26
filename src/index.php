@@ -1,17 +1,13 @@
 <?php
 
 require_once __DIR__ . '/../vendor/autoload.php';
+require_once __DIR__ . '/config/database.php';
 
 use app\Middleware\CorsMiddleware;
 
 CorsMiddleware::handle();
 
 header('Content-Type: application/json');
-
-define('DB_HOST', 'dbdollartoy.cnqokie0q9sv.us-east-1.rds.amazonaws.com');
-define('DB_NAME', 'dbdollartoy');
-define('DB_USER', 'admin');
-define('DB_PASS', 'dbdollartoy');
 
 $baseUri = '/ApiRestDollarToy/api';
 $uri = parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH);

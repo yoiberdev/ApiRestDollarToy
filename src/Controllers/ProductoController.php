@@ -32,7 +32,7 @@ class ProductoController
 
             case 'create':
                 $result = $this->create->add($data);
-                $this->sendEmailNotification($data);
+                // $this->sendEmailNotification($data);
                 return json_encode(['message' => 'Producto creado exitosamente', 'data' => $result]);
 
             case 'update':

@@ -40,8 +40,8 @@ class CategoriaController
 
             case 'create':
                 $result = $this->create->add($data);
-                $sendMail =$this->sendEmailNotification(['nombre' => $data['nombre']]);
-                return json_encode(['message' => 'Categoria creado exitosamente', 'data' => $result, 'sendMail' => $sendMail]);
+                // $sendMail =$this->sendEmailNotification(['nombre' => $data['nombre']]);
+                return json_encode(['message' => 'Categoria creado exitosamente', 'data' => $result]);
 
             case 'update':
                 $result =$this->update->updateById($data['id'], $data);
